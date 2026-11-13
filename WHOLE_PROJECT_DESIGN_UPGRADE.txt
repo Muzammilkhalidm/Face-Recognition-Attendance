@@ -1,0 +1,37 @@
+CYBERATTEND HRMS — WHOLE PROJECT DESIGN UPGRADE
+
+This update applies one consistent premium corporate design system across the Admin,
+Employee and HR workspaces. The visual language uses warm ivory backgrounds, white
+content surfaces, deep navy typography, muted blue accents, refined borders, softer
+shadows, rounded cards, cleaner tables and consistent form/button styling.
+
+Updated files:
+- static/css/style.css: global design system applied across all authenticated pages.
+- static/js/sidebar.js: persistent collapsible sidebar, accessible toggle labels,
+  saved open/closed preference on desktop, and restored sidebar scroll position.
+
+Existing Flask routes, templates, database files, authentication, attendance,
+face-recognition, messaging, WFH, leave, payroll and HR features are retained.
+
+Run the application using the same command and environment used before this update.
+If the browser shows old styling, perform a hard refresh (Ctrl+F5).
+
+Note: The sidebar toggle is a visual/navigation control; it does not grant or remove
+permissions. Existing server-side role checks remain responsible for access control.
+
+HR ACCOUNT MANAGEMENT & COMPLETE HR DATA EXPORT
+================================================
+- Main Admin now has a dedicated HR Management item in the admin sidebar.
+- Main Admin can create HR portal accounts, enable/disable access, and reset HR passwords.
+- HR signs in through /hrlogin (also /hr/login) and uses the independent HR portal.
+- HR has access to employee directory and employee records, attendance, leave requests,
+  WFH requests, performance, projects, shifts, documents, expense claims, payroll viewing,
+  recruitment, employee messages, and HR Excel reports.
+- The HR sidebar includes Complete HR Data (Excel), which exports separate worksheets for
+  employees, attendance, leave requests, WFH requests, payroll, performance, projects,
+  shifts, documents, expenses, job openings, and candidates where those modules exist.
+- Employee export includes HR-relevant profile/contact/work information and social/profile
+  fields, but deliberately excludes password hashes, encrypted passwords, face-recognition
+  samples, and raw biometric/geolocation coordinates.
+- Payroll in the HR portal remains view-only. Salary payment, system settings, backups,
+  dataset downloads, admin management, and other main-admin-only controls remain restricted.

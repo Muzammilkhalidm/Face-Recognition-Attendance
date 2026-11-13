@@ -1,0 +1,73 @@
+/* ca-extras.css - Performance page + Meeting alarm. Uses the theme variables so it matches every theme. */
+.perf-hero{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;padding:26px;margin-bottom:20px;border-radius:20px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--primary) 22%,var(--surface)),var(--surface) 70%);
+  border:1px solid var(--border-strong,var(--border));box-shadow:0 18px 44px rgba(0,0,0,.18)}
+.perf-ring{--p:0;width:150px;height:150px;border-radius:50%;display:grid;place-items:center;position:relative;
+  background:conic-gradient(var(--accent-1,var(--primary)) calc(var(--p)*1%),color-mix(in srgb,var(--text) 14%,transparent) 0);
+  box-shadow:0 0 30px var(--glow,transparent)}
+.perf-ring::before{content:"";position:absolute;inset:12px;border-radius:50%;background:var(--surface)}
+.perf-ring b{position:relative;font-size:2.4rem;line-height:1;color:var(--text)}
+.perf-ring b small{display:block;font-size:.8rem;font-weight:600;color:var(--text-dim);margin-top:4px}
+.perf-kicker{font-size:.72rem;letter-spacing:.14em;font-weight:800;color:var(--primary)}
+.perf-hero h2{margin:6px 0 4px;font-size:1.7rem;color:var(--text)}
+.perf-hero p{margin:0;color:var(--text-dim)}
+.perf-stars{font-size:1.5rem;letter-spacing:5px;color:#f5b301;margin:10px 0 2px;text-shadow:0 0 14px rgba(245,179,1,.45)}
+.perf-stars i{font-style:normal;opacity:.28;color:var(--text-dim)} .perf-stars i.on{opacity:1;color:#f5b301}
+.perf-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.perf-stat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 18px;position:relative;overflow:hidden}
+.perf-stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent-1,var(--primary))}
+.perf-stat:nth-child(2)::before{background:#22c55e}.perf-stat:nth-child(3)::before{background:#f59e0b}.perf-stat:nth-child(4)::before{background:var(--accent-2,#60a5fa)}
+.perf-stat span{display:block;font-size:.78rem;color:var(--text-dim);font-weight:600}
+.perf-stat b{display:block;font-size:1.55rem;margin-top:4px;color:var(--text)}
+.perf-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;margin-bottom:20px}
+.perf-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px;min-width:0}
+.perf-box h3{margin:0 0 14px;font-size:1.05rem;color:var(--text)}
+.perf-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.perf-note{border-radius:14px;padding:14px 16px;border:1px solid var(--border);background:color-mix(in srgb,var(--text) 4%,transparent)}
+.perf-note h4{margin:0 0 6px;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
+.perf-note p{margin:0;color:var(--text-2,var(--text));line-height:1.55;white-space:pre-line}
+.perf-note.good{border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.09)}.perf-note.good h4{color:#22c55e}
+.perf-note.grow{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.09)}.perf-note.grow h4{color:#f59e0b}
+.perf-meta{margin-top:14px;font-size:.8rem;color:var(--text-dim)}
+.perf-bars{display:flex;align-items:flex-end;gap:10px;height:170px;padding-top:8px;overflow-x:auto}
+.perf-bar{flex:1 0 46px;max-width:70px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:6px}
+.perf-bar i{display:block;width:100%;border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,var(--accent-1,var(--primary)),var(--accent-2,var(--primary-hover)));box-shadow:0 0 16px var(--glow,transparent);min-height:8px}
+.perf-bar b{font-size:.85rem;color:var(--text)} .perf-bar small{font-size:.68rem;color:var(--text-dim);text-align:center;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.perf-badge{display:inline-block;padding:4px 12px;border-radius:999px;font-size:.78rem;font-weight:700;background:var(--primary-soft);color:var(--primary-ink,var(--primary));border:1px solid var(--border-strong,var(--border))}
+.perf-badge.s5,.perf-badge.s4{background:rgba(34,197,94,.16);color:#22c55e;border-color:rgba(34,197,94,.5)}
+.perf-badge.s3{background:rgba(245,158,11,.16);color:#f59e0b;border-color:rgba(245,158,11,.5)}
+.perf-badge.s2,.perf-badge.s1{background:rgba(239,68,68,.16);color:#ef4444;border-color:rgba(239,68,68,.5)}
+.perf-timeline{display:flex;flex-direction:column;gap:14px}
+.perf-item{display:grid;grid-template-columns:96px 1fr;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;transition:.2s}
+.perf-item:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.25),0 0 0 1px var(--accent-1,var(--primary))}
+.perf-score{text-align:center;border-radius:14px;padding:12px 6px;background:var(--primary-soft);border:1px solid var(--border-strong,var(--border))}
+.perf-score b{display:block;font-size:1.9rem;line-height:1;color:var(--text)}.perf-score small{color:var(--text-dim)}
+.perf-item h4{margin:0 0 8px;font-size:1rem;color:var(--text)}
+.perf-empty{text-align:center;padding:46px 20px;border:2px dashed var(--border-strong,var(--border));border-radius:20px;background:var(--surface)}
+.perf-empty .big{font-size:3rem}.perf-empty h3{margin:8px 0 6px;color:var(--text)}.perf-empty p{margin:0;color:var(--text-dim)}
+@media(max-width:900px){.perf-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.perf-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.perf-hero{grid-template-columns:1fr;text-align:center;justify-items:center;padding:20px}.perf-two{grid-template-columns:1fr}.perf-item{grid-template-columns:1fr}.perf-score{display:flex;gap:8px;align-items:baseline;justify-content:center}.perf-ring{width:128px;height:128px}}
+
+/* ---------------- meeting alarm: employee overlay ---------------- */
+.alarm-overlay{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;padding:18px;background:rgba(120,0,10,.88);backdrop-filter:blur(6px);animation:alarm-flash 1s infinite}
+@keyframes alarm-flash{0%,100%{background:rgba(120,0,10,.9)}50%{background:rgba(220,38,38,.92)}}
+.alarm-box{width:min(520px,100%);text-align:center;color:#fff;background:rgba(10,4,12,.55);border:2px solid rgba(255,255,255,.65);border-radius:26px;padding:30px 22px;box-shadow:0 0 70px rgba(255,60,60,.7)}
+.alarm-bell{font-size:4.2rem;display:inline-block;animation:alarm-ring .5s infinite;transform-origin:50% 10%}
+@keyframes alarm-ring{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(18deg)}}
+.alarm-box small{letter-spacing:.2em;font-weight:800;opacity:.9}
+.alarm-box h2{margin:8px 0;font-size:1.9rem;color:#fff}.alarm-box p{margin:0 0 6px;font-size:1.1rem;opacity:.95}
+.alarm-box .alarm-from{font-size:.85rem;opacity:.8;margin-bottom:18px}
+.alarm-box button{border:0;border-radius:16px;padding:16px 26px;font-size:1.15rem;font-weight:800;cursor:pointer;width:100%;color:#7f0010;background:#fff}
+.alarm-box button:active{transform:scale(.98)}
+.alarm-sound-tip{margin-top:12px;font-size:.9rem;font-weight:700;background:#fff;color:#b91c1c;border-radius:12px;padding:8px}
+.alarm-enable{position:fixed;right:16px;bottom:16px;z-index:9998;border:0;border-radius:999px;padding:12px 18px;font-weight:800;cursor:pointer;background:var(--primary);color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+/* ---------------- meeting alarm: admin page ---------------- */
+.alert-hero{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.alert-form{background:linear-gradient(160deg,rgba(220,38,38,.16),var(--surface) 60%);border:1px solid rgba(239,68,68,.55);border-radius:20px;padding:22px}
+.alert-form h2{margin:0 0 4px}.alert-form .sub{color:var(--text-dim);margin:0 0 16px}
+.btn-ring{width:100%;border:0;border-radius:16px;padding:18px;font-size:1.2rem;font-weight:800;color:#fff!important;cursor:pointer;background:linear-gradient(135deg,#b91c1c,#ef4444);box-shadow:0 12px 34px rgba(239,68,68,.45);animation:ring-pulse 1.8s infinite}
+@keyframes ring-pulse{0%,100%{box-shadow:0 12px 34px rgba(239,68,68,.45)}50%{box-shadow:0 12px 50px rgba(239,68,68,.85)}}
+.alert-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.alert-chips button{border:1px solid var(--border-strong,var(--border));background:var(--surface-2,var(--surface));color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:.82rem}
+.alert-state{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.74rem;font-weight:800}
+.alert-state.on{background:rgba(239,68,68,.2);color:#ef4444;animation:ring-pulse 1.4s infinite}.alert-state.off{background:rgba(148,163,184,.2);color:var(--text-dim)}
+@media(max-width:860px){.alert-hero{grid-template-columns:1fr}}

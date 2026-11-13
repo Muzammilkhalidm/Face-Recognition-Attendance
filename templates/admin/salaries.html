@@ -1,0 +1,43 @@
+{% extends 'admin/base.html' %}
+{% block title %}Salaries{% endblock %}{% block heading %}Salaries &amp; Payroll{% endblock %}
+{% block content %}
+<section class="panel"><h2>Pay salaries — {{ month }}</h2>
+<form method="get" class="row-form"><input type="month" name="month" value="{{ month }}"><button class="btn" type="submit">Show month</button>
+<a class="btn secondary" href="{{ url_for('admin_salary_setup') }}">Set employee salaries</a></form>
+<p class="hr-note">1) Set each employee's monthly salary once. 2) Press <b>Generate / refresh payroll</b> for the month. 3) Adjust bonus or deductions if you want, then pay one by one or <b>Pay everyone</b>.
+You decide how much is deducted for every leave — the amount in the box is only a suggestion (monthly salary ÷ 30 × leave days).</p>
+<div class="row-form" style="margin-top:12px">
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="month" value="{{ month }}"><input type="hidden" name="action" value="generate"><button class="btn primary">Generate / refresh payroll</button></form>
+<form method="post" onsubmit="return confirm('Pay ALL pending salaries for {{ month }}?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="month" value="{{ month }}"><input type="hidden" name="action" value="pay_all"><button class="btn" {% if not totals.pending %}disabled{% endif %}>Pay everyone ({{ totals.pending }} pending)</button></form>
+</div>
+{% if no_salary %}<p class="hr-note">⚠ {{ no_salary }} approved employee(s) have no salary set yet and will be skipped. <a href="{{ url_for('admin_salary_setup') }}">Set salaries</a></p>{% endif %}
+</section>
+
+<div class="grid-cards"><div class="stat-card"><span>Employees on payroll</span><b>{{ totals.count }}</b></div><div class="stat-card"><span>Paid / pending</span><b>{{ totals.paid }} / {{ totals.pending }}</b></div><div class="stat-card"><span>Total deductions</span><b>Rs {{ '{:,.0f}'.format(totals.deduction) }}</b></div><div class="stat-card"><span>Total net salary</span><b>Rs {{ '{:,.0f}'.format(totals.net) }}</b></div></div>
+
+<section class="panel"><h2>Payroll for {{ month }}</h2>
+<div class="table-wrap"><table><thead><tr><th>Employee</th><th>Basic + allowance</th><th>Approved leave this month &amp; deduction (Rs)</th><th>Bonus</th><th>Other deduction</th><th>Total deduction</th><th>Net</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+{% for r in rows %}{% set locked = (r.status == 'Paid') %}
+<tr>
+<td><b>{{ r.full_name }}</b><div class="table-subtext">{{ r.designation or r.username }}</div></td>
+<td>Rs {{ '{:,.0f}'.format(r.basic + r.allowance) }}</td>
+<td>{% if r.leaves %}{% for l in r.leaves %}<div class="leave-ded"><span>{{ l.leave_date }} · {{ l.leave_type }}</span>
+{% if locked %}<b>Rs {{ '{:,.0f}'.format(l.salary_deduction or 0) }}</b>{% else %}<input form="f{{ r.id }}" type="number" min="0" step="1" name="leave_ded_{{ l.id }}" value="{{ '%g'|format(l.salary_deduction or 0) }}">{% endif %}</div>{% endfor %}
+<div class="table-subtext">{{ r.leave_days }} day(s) · suggestion: Rs {{ '{:,.0f}'.format(r.suggested) }}</div>{% else %}<span class="muted">No leave</span>{% endif %}</td>
+<td>{% if locked %}Rs {{ '{:,.0f}'.format(r.bonus) }}{% else %}<input form="f{{ r.id }}" class="amount-input" type="number" min="0" step="1" name="bonus" value="{{ '%g'|format(r.bonus) }}">{% endif %}</td>
+<td>{% if locked %}Rs {{ '{:,.0f}'.format(r.other_deduction) }}{% else %}<input form="f{{ r.id }}" class="amount-input" type="number" min="0" step="1" name="other_deduction" value="{{ '%g'|format(r.other_deduction) }}">{% endif %}</td>
+<td>Rs {{ '{:,.0f}'.format(r.deduction) }}<div class="table-subtext">leave {{ '{:,.0f}'.format(r.leave_deduction) }} + other {{ '{:,.0f}'.format(r.other_deduction) }}</div></td>
+<td class="net-cell">Rs {{ '{:,.0f}'.format(r.net) }}</td>
+<td>{% if locked %}<span class="badge ok">Paid</span><div class="table-subtext">{{ r.paid_at|dt }}</div>{% elif r.status=='On Hold' %}<span class="badge bad">On hold</span>{% else %}<span class="badge warn">Pending</span>{% endif %}</td>
+<td>
+{% if locked %}
+<form method="post" class="inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="month" value="{{ month }}"><input type="hidden" name="payroll_id" value="{{ r.id }}"><button class="btn small secondary" name="action" value="reopen" onclick="return confirm('Re-open this paid salary for editing?')">Re-open</button></form>
+{% else %}
+<form id="f{{ r.id }}" method="post" class="inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="month" value="{{ month }}"><input type="hidden" name="payroll_id" value="{{ r.id }}">
+<input type="hidden" name="note" value="{{ r.note }}">
+<button class="btn small secondary" name="action" value="save">Save</button><button class="btn small" name="action" value="save_pay">Pay</button>
+{% if r.status=='On Hold' %}<button class="btn small secondary" name="action" value="unhold">Release</button>{% else %}<button class="btn small secondary" name="action" value="hold">Hold</button>{% endif %}</form>
+{% endif %}</td></tr>
+{% else %}<tr><td colspan="9" class="muted">No payroll for {{ month }} yet. Press “Generate / refresh payroll”.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}

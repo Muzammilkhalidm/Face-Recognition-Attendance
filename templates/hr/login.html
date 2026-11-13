@@ -1,0 +1,13 @@
+{% extends "public_base.html" %}
+{% block bodyclass %}
+{% block visual_kicker %}PEOPLE OPERATIONS{% endblock %}
+{% block visual_heading %}People make<br>the difference.{% endblock %}
+{% block visual_description %}Bring employee experience, attendance and workplace operations together.{% endblock %}hr-auth{% endblock %}
+{% block title %}HR Login | CyberAttend{% endblock %}
+{% block content %}
+<div class="auth-kicker">HUMAN RESOURCES</div><h1>HR workspace</h1><p class="sub">Sign in to manage people, attendance and workplace operations.</p>
+<form method="POST" autocomplete="off"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="field"><label for="username">HR username</label><input id="username" type="text" name="username" placeholder="Enter HR username" required autofocus autocomplete="username"></div>
+<div class="field"><label for="password">Password</label><input id="password" type="password" name="password" placeholder="Enter your password" required autocomplete="current-password"></div>
+<button class="btn auth-submit" type="submit">Sign in to HR <span aria-hidden="true">→</span></button></form>
+{% endblock %}

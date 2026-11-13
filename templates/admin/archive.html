@@ -1,0 +1,47 @@
+{% extends "admin/base.html" %}
+{% block title %}Deleted Employees Archive{% endblock %}
+{% block heading %}Deleted Employees &mdash; 10-Year Archive{% endblock %}
+{% block content %}
+<div class="grid-cards arch-stats">
+    <div class="stat-card"><span>Archived people</span><b data-count="{{ stats.people }}">{{ stats.people }}</b></div>
+    <div class="stat-card"><span>Face images stored</span><b data-count="{{ stats.faces }}">{{ stats.faces }}</b></div>
+    <div class="stat-card"><span>Complete (50 samples)</span><b data-count="{{ stats.full }}">{{ stats.full }}</b></div>
+    <div class="stat-card"><span>Partial / none</span><b data-count="{{ stats.partial + stats.none }}">{{ stats.partial + stats.none }}</b></div>
+</div>
+
+<div class="card">
+    <div class="task-top">
+        <div><h2>All deleted employee records <span class="badge violet">Main admin only</span></h2>
+        <p class="muted">Every deleted employee is kept for 10 years (3652 days) with their profile, face samples and history. Click a row to open everything.</p></div>
+        <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap">
+            <a class="btn secondary small" href="{{ url_for('admin_archive_dataset_zip') }}">Download deleted dataset (ZIP)</a>
+            <a class="btn secondary small" href="{{ url_for('admin_archive_csv') }}">Download register (CSV)</a>
+        </div>
+    </div>
+    <form class="filters" method="get">
+        <div class="field"><label>Search</label><input type="text" name="q" value="{{ f_q }}" placeholder="Name, username, ID, department"></div>
+        <div class="field"><label>Department</label><select name="department"><option value="">All</option>{% for d in depts %}<option value="{{ d }}" {% if d==f_dept %}selected{% endif %}>{{ d }}</option>{% endfor %}</select></div>
+        <div class="field"><label>Status when deleted</label><select name="status"><option value="">All</option>{% for s in statuses %}<option value="{{ s }}" {% if s==f_status %}selected{% endif %}>{{ s|replace('_',' ')|title }}</option>{% endfor %}</select></div>
+        <button class="btn auto" type="submit">Filter</button>
+    </form>
+    <div class="table-wrap"><table>
+        <thead><tr><th>Face</th><th>ID</th><th>Name</th><th>Username</th><th>Department</th><th>Status</th><th>Samples</th><th>Archived</th><th>Keep until</th><th></th></tr></thead>
+        <tbody>
+        {% for r in rows %}
+            <tr class="arch-row">
+                <td>{% if r.faces %}<img class="arch-thumb" loading="lazy" src="{{ url_for('admin_archive_face', emp_id=r.employee_id, name='1.jpg') }}" alt="">{% else %}<span class="arch-thumb empty">{{ r.full_name[:1]|upper }}</span>{% endif %}</td>
+                <td>#{{ '%03d'|format(r.employee_id) }}</td>
+                <td><a href="{{ url_for('admin_archive_detail', archive_id=r.archive_id) }}"><b>{{ r.full_name }}</b></a></td>
+                <td>{{ r.username }}</td>
+                <td><span class="badge gray">{{ r.department }}</span></td>
+                <td><span class="badge {{ 'ok' if r.status=='approved' else 'warn' }}">{{ r.status|replace('_',' ')|title }}</span></td>
+                <td>{% if r.faces>=50 %}<span class="badge ok">{{ r.faces }}/50</span>{% elif r.faces %}<span class="badge warn">{{ r.faces }}/50</span>{% else %}<span class="badge bad">0/50</span>{% endif %}</td>
+                <td>{{ r.archived_at|dt }}</td>
+                <td>{{ r.retention_until[:10] }}<br><small class="muted">{{ '{:,}'.format(r.days_left) if r.days_left is not none else '' }} days left</small></td>
+                <td><a class="btn secondary small" href="{{ url_for('admin_archive_detail', archive_id=r.archive_id) }}">Open</a></td>
+            </tr>
+        {% else %}<tr><td colspan="10" class="muted">No archived employees match.</td></tr>{% endfor %}
+        </tbody>
+    </table></div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+CYBERATTEND FACE ENROLMENT FIX
+================================
+
+What was corrected:
+1. The /enroll page no longer deletes face samples every time it is refreshed.
+   Previously, a refresh could erase captured samples and reset the database count.
+2. The final sample now runs through a retryable completion function.
+   If LBPH model training fails after sample 50, the next camera request retries
+   training instead of falsely reporting success or trapping the employee in a loop.
+3. Employee status changes to "pending" only after successful model training.
+   This is the status used by the admin approvals workflow.
+4. Admin notification and dataset ZIP rebuilding are attempted after the employee
+   is moved to pending; failures are logged without hiding the employee from the
+   approvals list.
+5. The browser now displays server error details/status instead of only "Error".
+6. OpenCV LBPH labels are explicitly passed as int32, and sample-save failures
+   raise a clear error.
+
+Important:
+- requirements.txt already uses opencv-contrib-python-headless, which provides cv2.face.
+- Install dependencies from this project's folder with:
+      py -m pip install -r requirements.txt
+- Verify OpenCV face support with:
+      py -c "import cv2; print(cv2.__version__); print(hasattr(cv2, 'face'))"
+  The final value should be True.
+- Restart Flask after installing dependencies.
+- If a server-side training error remains, check the Flask terminal; the browser
+  now reports the HTTP/server error and the terminal logs the full traceback.
+
+No existing employee records or dataset files were intentionally deleted by this patch.

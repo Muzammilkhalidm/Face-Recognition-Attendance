@@ -1,0 +1,14 @@
+{% extends 'admin/base.html' %}
+{% block title %}Employee salaries{% endblock %}{% block heading %}Employee Salaries{% endblock %}
+{% block content %}
+<section class="panel"><h2>Monthly salary for every employee</h2>
+<p class="hr-note">Enter each employee's fixed monthly salary and allowance. These are used when you generate payroll. Only pending months are updated when you change them.</p>
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="table-wrap"><table><thead><tr><th>Employee</th><th>Designation</th><th>Monthly salary (Rs)</th><th>Allowance (Rs)</th><th>Last updated</th></tr></thead><tbody>
+{% for r in rows %}<tr><td><b>{{ r.full_name }}</b><div class="table-subtext">{{ r.username }}</div></td><td>{{ r.designation or '—' }}</td>
+<td><input class="amount-input" type="number" min="0" step="1" name="base_{{ r.id }}" value="{{ '%g'|format(r.base_salary) }}"></td>
+<td><input class="amount-input" type="number" min="0" step="1" name="allow_{{ r.id }}" value="{{ '%g'|format(r.allowance) }}"></td>
+<td class="muted">{{ r.updated_at|dt if r.updated_at else 'Not set' }}{% if r.updated_by %}<div class="table-subtext">{{ r.updated_by }}</div>{% endif %}</td></tr>
+{% else %}<tr><td colspan="5" class="muted">No approved employees yet.</td></tr>{% endfor %}</tbody></table></div>
+<p style="margin-top:14px"><button class="btn primary" type="submit">Save all salaries</button> <a class="btn secondary" href="{{ url_for('admin_salaries') }}">Go to payroll</a></p></form></section>
+{% endblock %}

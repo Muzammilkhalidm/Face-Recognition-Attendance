@@ -1,0 +1,14 @@
+{% extends "public_base.html" %}
+{% block bodyclass %}
+{% block visual_kicker %}EMPLOYEE EXPERIENCE{% endblock %}
+{% block visual_heading %}Your workday<br>beautifully connected.{% endblock %}
+{% block visual_description %}Everything you need to stay connected, focused and on track.{% endblock %}employee-auth{% endblock %}
+{% block title %}Employee Login | CyberAttend{% endblock %}
+{% block content %}
+<div class="auth-kicker">EMPLOYEE WORKSPACE</div><h1>Welcome back</h1><p class="sub">Sign in to continue to your employee workspace.</p>
+<form method="POST" autocomplete="off"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="field"><label for="username">Username</label><input id="username" type="text" name="username" placeholder="Enter your username" required autofocus autocomplete="username"></div>
+<div class="field"><label for="password">Password</label><input id="password" type="password" name="password" placeholder="Enter your password" required autocomplete="current-password"></div>
+<button class="btn auth-submit" type="submit">Continue to face scan <span aria-hidden="true">→</span></button></form>
+<div class="auth-links"><a href="{{ url_for('forgot_password') }}">Forgot password?</a><p class="auth-help">Need an account or login assistance? Please contact your administrator.</p></div>
+{% endblock %}

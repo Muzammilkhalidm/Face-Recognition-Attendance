@@ -1,0 +1,11 @@
+{% extends 'hr/base.html' %}
+{% block title %}Expense Claims{% endblock %}{% block heading %}Expense Claims{% endblock %}
+{% block content %}
+<section class="panel"><h2>Claims from employees</h2><div class="table-wrap"><table><thead><tr><th>Employee</th><th>Category</th><th>Amount</th><th>Date</th><th>Details</th><th>Status</th><th>Decision</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.full_name }}</td><td>{{ r.category }}</td><td>Rs {{ '{:,.0f}'.format(r.amount) }}</td><td>{{ r.expense_date }}</td>
+<td>{{ r.description }}{% if r.receipt_url and (r.receipt_url.startswith('http://') or r.receipt_url.startswith('https://')) %} · <a href="{{ r.receipt_url }}" target="_blank" rel="noopener">Receipt</a>{% endif %}</td>
+<td>{{ r.status }}{% if r.admin_note %}<div class="table-subtext">{{ r.admin_note }}</div>{% endif %}</td>
+<td>{% if r.status=='Pending' %}<form method="post" class="row-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="expense_id" value="{{ r.id }}"><input name="note" placeholder="Note"><button class="btn small" name="status" value="Approved">Approve</button><button class="btn small secondary" name="status" value="Rejected">Reject</button></form>{% else %}—{% endif %}</td></tr>
+{% else %}<tr><td colspan="7" class="muted">No expense claims.</td></tr>{% endfor %}</tbody></table></div>
+<p class="hr-note">Approved claims notify the admin so the money can be reimbursed.</p></section>
+{% endblock %}

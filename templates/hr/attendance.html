@@ -1,0 +1,17 @@
+{% extends 'hr/base.html' %}
+{% block title %}Attendance{% endblock %}{% block heading %}Attendance{% endblock %}
+{% block content %}
+<section class="panel"><h2>Filter</h2>
+<form method="get" class="row-form">
+<label>From <input type="date" name="from" value="{{ start }}"></label>
+<label>To <input type="date" name="to" value="{{ end }}"></label>
+<select name="employee_id"><option value="">All employees</option>{% for e in emps %}<option value="{{ e.id }}" {% if emp_id==e.id %}selected{% endif %}>{{ e.full_name }}</option>{% endfor %}</select>
+<select name="dept"><option value="">All departments</option>{% for d in depts %}<option value="{{ d.id }}" {% if dept==d.id %}selected{% endif %}>{{ d.name }}</option>{% endfor %}</select>
+<button class="btn" type="submit">Apply</button>
+<a class="btn secondary" href="{{ url_for('hr.attendance_xlsx', **{'from': start, 'to': end, 'employee_id': emp_id or '', 'dept': dept or ''}) }}">Download Excel</a></form></section>
+<section class="panel"><h2>Summary per employee</h2><div class="table-wrap"><table><thead><tr><th>Employee</th><th>Department</th><th>Days present</th><th>Late days</th><th>Hours worked</th></tr></thead><tbody>
+{% for s in summary %}<tr><td>{{ s.full_name }}</td><td>{{ s.dept or '—' }}</td><td>{{ s.days }}</td><td>{{ s.late }}</td><td>{{ s.secs|hm }}</td></tr>{% else %}<tr><td colspan="5" class="muted">No attendance in this range.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="panel"><h2>Daily records</h2><div class="table-wrap"><table><thead><tr><th>Date</th><th>Employee</th><th>Check-in</th><th>Check-out</th><th>Worked</th><th>Late</th><th>Mode</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.work_date }}</td><td>{{ r.full_name }}</td><td>{{ r.check_in|dt }}</td><td>{{ r.check_out|dt if r.check_out else '—' }}</td><td>{{ r.worked_seconds|hm if r.worked_seconds else '—' }}</td><td>{{ 'Yes' if r.is_late else 'No' }}</td><td>{{ r.work_mode or 'Office' }}{% if r.location_name %} · {{ r.location_name }}{% endif %}</td></tr>
+{% else %}<tr><td colspan="7" class="muted">No records.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

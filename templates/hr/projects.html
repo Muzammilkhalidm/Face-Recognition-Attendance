@@ -1,0 +1,19 @@
+{% extends 'hr/base.html' %}
+{% block title %}Projects{% endblock %}{% block heading %}Projects{% endblock %}
+{% block content %}
+<section class="panel"><h2>Assign a project</h2>
+<form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="create">
+<label>Employee<select name="employee_id" required>{% for e in emps %}<option value="{{ e.id }}">{{ e.full_name }}</option>{% endfor %}</select></label>
+<label>Title<input name="title" required></label>
+<label>Priority<select name="priority">{% for p in priorities %}<option {% if p=='Medium' %}selected{% endif %}>{{ p }}</option>{% endfor %}</select></label>
+<label>Start<input type="date" name="start_date"></label>
+<label>Deadline<input type="date" name="due_date"></label>
+<label>Description<textarea name="description" rows="2"></textarea></label>
+<div><button class="btn primary">Assign</button></div></form></section>
+<section class="panel"><h2>All projects</h2><div class="table-wrap"><table><thead><tr><th>Employee</th><th>Project</th><th>Priority</th><th>Deadline</th><th>Status / progress</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.full_name }}</td><td><b>{{ r.title }}</b><div class="table-subtext">{{ r.description }}</div>{% if r.employee_note %}<div class="table-subtext"><b>Employee note:</b> {{ r.employee_note }}</div>{% endif %}</td><td>{{ r.priority }}</td><td>{{ r.due_date or '—' }}</td>
+<td><form method="post" class="row-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="update"><input type="hidden" name="project_id" value="{{ r.id }}">
+<select name="status">{% for s in statuses %}<option {% if r.status==s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select>
+<input type="number" name="progress" min="0" max="100" value="{{ r.progress }}" style="width:70px">%<button class="btn small">Save</button></form></td></tr>
+{% else %}<tr><td colspan="5" class="muted">No projects yet.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

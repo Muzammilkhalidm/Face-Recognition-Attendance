@@ -1,0 +1,17 @@
+{% extends 'hr/base.html' %}
+{% block title %}Temporary HR Assignments{% endblock %}{% block heading %}Temporary HR Assignments{% endblock %}
+{% block content %}
+<section class="panel"><h2>Assign temporary HR access</h2>
+<p class="hr-note">Only Main HR can create these accounts. Temporary HR staff can use the separate HR portal until their assignment expires.</p>
+<form method="post" class="grid grid-2" autocomplete="off">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="field"><label>Full name</label><input name="full_name" required maxlength="100"></div>
+<div class="field"><label>Username</label><input name="username" required minlength="3" maxlength="40"></div>
+<div class="field"><label>Temporary password</label><input type="password" name="password" required minlength="8"></div>
+<div class="field"><label>Assignment duration</label><select name="days"><option value="1">1 day</option><option value="3">3 days</option><option value="7" selected>7 days</option><option value="30">30 days</option></select></div>
+<div><button class="btn primary" type="submit">Create temporary HR login</button></div>
+</form></section>
+<section class="panel"><h2>HR accounts</h2><div class="table-wrap"><table><thead><tr><th>Name</th><th>Username</th><th>Type</th><th>Expires</th><th>Status</th><th>Action</th></tr></thead><tbody>
+{% for u in users %}<tr><td><b>{{ u.full_name }}</b></td><td>{{ u.username }}</td><td>{{ 'Main HR' if u.is_main else 'Temporary HR' }}</td><td>{{ u.expires_at or 'Never' }}</td><td>{{ 'Active' if u.active else 'Disabled' }}</td><td>{% if not u.is_main %}<form method="post" action="{{ url_for('hr.team_toggle',user_id=u.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn small secondary">{{ 'Disable' if u.active else 'Enable' }}</button></form>{% else %}—{% endif %}</td></tr>
+{% else %}<tr><td colspan="6">No HR accounts.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

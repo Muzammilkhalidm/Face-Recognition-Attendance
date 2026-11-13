@@ -1,0 +1,96 @@
+CyberAttend - changes in this version
+=====================================
+
+1. WORK & TASKS (employee)
+   - Projects assigned by HR (HR > Projects) and by admin (Admin > Advanced HR) now appear on the employee's
+     "My Work & Tasks" page and on the dashboard, together with admin tasks.
+   - Employee can set status (Planned / In Progress / Blocked / Completed), progress % and a note for HR.
+     HR sees the note and progress; admin sees them on Admin > Work & Tasks (new read-only projects table).
+   - Summary cards (to do, completed, overdue), filter buttons, progress bar, overdue highlight, "New" badge.
+   - Notification for new work opens /tasks. Excel "Download my sheet" now has a "My Projects" sheet too.
+
+2. MESSAGES
+   - HR can now send messages (one employee / a department / everyone): HR > Employee Messages.
+   - Employee Messages page has an Inbox "From Admin & HR" (labelled and colour-coded), then a form to write
+     to management, then sent messages with "HR reply" / "Admin reply".
+   - Admin's conversation view also shows messages HR sent.
+
+3. NOTIFICATION SOUND
+   - static/sounds/notify.wav is replaced by a short synthesized roar-style sound (1.5 s).
+   - To use your own: drop notify.mp3 into static/sounds/ - it is used automatically instead of the .wav.
+
+4. DELETED EMPLOYEES BADGE (admin sidebar)
+   - Shows only deleted employees that are NEW since you last opened that page; disappears after you open it.
+
+5. HR DOCUMENTS - CNIC
+   - New "CNIC / ID number" field next to Type. For type "CNIC / ID" it auto-formats 12345-1234567-1 and
+     must be 13 digits. Shown in the records table, HR Excel exports and the admin Advanced HR form.
+
+6. HR EXCEL
+   - "Complete HR Data (Excel)": employees (with CNIC), attendance summary, daily attendance (check-in/out,
+     hours, late, absent, work mode, location), warnings, leave, WFH, work & tasks, projects, messages, payroll,
+     performance, shifts, documents, expenses. No passwords or face data.
+   - HR > Employees > (employee) > "Download this employee's full record (Excel)" - same sheets for one person.
+
+7. MOBILE / USER FRIENDLY
+   - static/css/responsive.css + static/js/mobile.js on every page (admin, HR, employee, login).
+   - Tables turn into readable cards on phones, 16px inputs (no iPhone zoom), bigger tap targets,
+     sticky top bar, full-width popups, double-tap protection on forms, safe-area support.
+   - Installable: /manifest.webmanifest + icons (Add to Home Screen on phones).
+
+8. PHONE NUMBER + FORGOT PASSWORD
+   - Admin > Employees > Create employee now has a required Phone number field (10-15 digits).
+   - Forgot password page: besides the nickname way, employee can enter the phone number or email on the
+     account -> admin gets a notification (popup + sound + Notifications page) that opens the employee page,
+     where "Reset password" already exists. Admin then gives the new password privately.
+   - Same reply is shown whether or not the phone/email exists (nobody can probe which numbers are registered),
+     and requests are rate-limited. No SMS is sent (no SMS gateway in the project).
+
+9. SMS (via SMSGate - see ../smsgate)
+   - New file smsclient.py. Set SMSGATE_URL, SMSGATE_SID, SMSGATE_TOKEN (and optional SMS_NOTIFY_KINDS,
+     default "leave,warning,salary") to turn it on. Without them the portal behaves exactly as before.
+   - Forgot password: employee enters the phone number -> gets a 6-digit SMS code -> /forgot-password/otp ->
+     sets a new password (face scan is still needed to log in). Same reply for known/unknown numbers; the admin is
+     still notified. Employee gets an SMS when the password changes.
+   - Leave decisions, warnings and salary notifications are also sent to the employee's phone as SMS.
+
+10. PREMIUM APPEARANCE UPDATE
+   - Added a separate Gold appearance across Admin, HR and Employee panels.
+   - The reference-style office banner is scoped to Gold only; other appearances use
+     their own palette-matched gradient banner and do not reuse the Gold artwork.
+   - Reworked Light into a cool slate appearance so the workspace is not a plain white canvas.
+   - Updated brand contrast for Dark, Blue, Purple, Red and Gold.
+   - The bundled main admin account has been reset to the documented first-login password:
+     muzammil / muzammil182921. The account is flagged to require a password change.
+   - SMSGate local dashboard password remains ChangeThisPassword123!; change it before deployment.
+
+11. GOLD + LIGHT APPEARANCE REDESIGN
+   - Gold is now "Champagne Gold", matched to the office photo: ivory/marble surfaces, deep navy
+     (suit) text and sidebar, polished gold gradient for active menu, buttons, card accents and table headers.
+     The banner shows the photo with a warm ivory fade (same style as the sign-in page) and readable navy text.
+   - Gold no longer inherits the dark-theme "all text white" rules (that is what made it look muddy).
+   - Light is now "Clean Light": white cards on a soft cool canvas, navy sidebar, cobalt-blue accents,
+     visible username in the sidebar, white tables, proper banner layout with blue accent artwork.
+   - Banner layout (padding, title, kicker, dots) fixed for Gold and Light - text no longer touches the edge.
+   - Files: static/css/workspace-gold.css (rewritten), static/css/themes-premium.css (gold removed from dark groups),
+     admin/hr/employee base.html (CSS cache version bumped). Hard-refresh (Ctrl+F5) once.
+
+12. FULL PROJECT POLISH (all Admin, HR and Employee pages, all 6 themes)
+   - Every page (75 pages across 3 roles) tested: no errors.
+   - Automatic contrast check on every page in every theme; ~100 unreadable items fixed:
+       * sidebar counter badges were white-on-white (Blue) / faint (Dark, Purple, Red)
+       * primary buttons in Dark and Purple had white text on light blue - now deep, readable gradients
+       * Blue theme active filter chips were white-on-white; amber/red status text now readable on coloured themes
+       * "Secure access" footer on sign-in pages was too faint
+   - Sign-in pages (Admin / HR / Employee / Forgot password) cleaned up: the floating "CA" badge,
+     rings and chips no longer cover the headline, the full photo is visible, stat cards line up under the
+     headline, the form appears quickly (fade-in was 3.5 s), and phones get one compact banner + form.
+   - Every sidebar item now has a matching icon (Certificates, HR Management, Full Records, Activity Log,
+     downloads, Complete HR Data, Salary/Payroll wallet, Locations pin, etc.).
+   - The workspace banner now shows the right title for every section (Activity log, Certificates,
+     Documents, Expense claims, Archive, Admins, Advanced HR ...) instead of repeating the dashboard title.
+   - Employee leave balance shows clean large numbers instead of red pill badges.
+   - Phones: stat cards show two per row instead of one long column.
+   - Files: static/css/themes-premium.css, workspace-gold.css, auth-premium.css, responsive.css,
+     static/js/workspace-hero.js, templates/_icons.html, admin/hr/employee base.html, public_base.html.
+   Hard-refresh the browser once (Ctrl+F5).

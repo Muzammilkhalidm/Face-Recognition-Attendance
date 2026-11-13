@@ -1,0 +1,7 @@
+{% extends "employee/base.html" %}
+{% block title %}My Certificates{% endblock %}{% block heading %}My Certificates{% endblock %}
+{% block content %}
+<section class="card"><h2>Your achievements</h2><p class="muted">Certificates issued to you by the company appear here. Open a certificate to print it or save it as a PDF.</p>
+{% for cert in certificates %}<div class="notice"><div class="row"><div><strong>{{ cert.certificate_title }}</strong><p>{{ cert.period }} · Issued {{ cert.issued_at|dt }}</p></div><span class="spacer"></span><a class="btn small" href="{{ url_for('employee_certificate_view', cert_id=cert.id) }}">View certificate</a></div></div>{% else %}<p class="muted">You don't have any certificates yet. When HR or Admin issues one, it will appear here.</p>{% endfor %}
+</section>
+{% endblock %}

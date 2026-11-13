@@ -1,0 +1,36 @@
+{% extends 'hr/base.html' %}
+{% block title %}{{ e.full_name }}{% endblock %}{% block heading %}{{ e.full_name }}{% endblock %}
+{% block content %}
+<div class="grid-cards">
+  <div class="stat-card"><span>Days present this month</span><b>{{ att.days }}</b></div>
+  <div class="stat-card"><span>Late arrivals this month</span><b>{{ att.late }}</b></div>
+  <div class="stat-card"><span>Hours worked this month</span><b>{{ att.secs|hm }}</b></div>
+  <div class="stat-card"><span>Annual leave left</span><b>{{ (balance.annual_total-balance.annual_used)|round(1) }}</b></div>
+</div>
+<section class="panel"><h2>HR profile — {{ e.dept or 'No department' }} · {{ e.username }}</h2>
+<form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>Designation<input name="designation" value="{{ e.designation }}"></label>
+<label>Employee code<input name="employee_code" value="{{ e.employee_code }}"></label>
+<label>Employment type<select name="employment_type">{% for t in types %}<option {% if e.employment_type==t %}selected{% endif %}>{{ t }}</option>{% endfor %}</select></label>
+<label>Work location<input name="work_location" value="{{ e.work_location }}"></label>
+<label>Manager<input name="manager_name" value="{{ e.manager_name }}"></label>
+<label>Joining date<input type="date" name="joining_date" value="{{ e.joining_date }}"></label>
+<label>Skills<input name="skills" value="{{ e.skills }}"></label>
+<label>Education<input name="education" value="{{ e.education }}"></label>
+<div><button class="btn primary" type="submit">Save HR profile</button></div></form>
+<p class="hr-note">Contact: {{ e.email or 'no email' }} · {{ e.phone or 'no phone' }}. Passwords, face data and salary are not visible here.</p></section>
+
+<div class="grid grid-2">
+<section class="panel"><h2>Recent leave</h2><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Status</th></tr></thead><tbody>
+{% for r in leaves %}<tr><td>{{ r.leave_date }}</td><td>{{ r.leave_type }}</td><td>{{ r.status|title }}</td></tr>{% else %}<tr><td colspan="3" class="muted">No leave yet.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="panel"><h2>Performance reviews</h2><div class="table-wrap"><table><thead><tr><th>Period</th><th>Score</th><th>Reviewer</th></tr></thead><tbody>
+{% for r in reviews %}<tr><td>{{ r.review_period }}</td><td>{{ r.score }}/5</td><td>{{ r.reviewer }}</td></tr>{% else %}<tr><td colspan="3" class="muted">No reviews yet.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="panel"><h2>Projects</h2><div class="table-wrap"><table><thead><tr><th>Project</th><th>Status</th><th>Progress</th></tr></thead><tbody>
+{% for r in projects %}<tr><td>{{ r.title }}</td><td>{{ r.status }}</td><td>{{ r.progress }}%</td></tr>{% else %}<tr><td colspan="3" class="muted">No projects.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="panel"><h2>Shifts &amp; documents</h2><div class="table-wrap"><table><thead><tr><th>Item</th><th>Detail</th></tr></thead><tbody>
+{% for r in shifts %}<tr><td>Shift: {{ r.shift_name }}</td><td>{{ r.start_time }}–{{ r.end_time }}</td></tr>{% endfor %}
+{% for r in documents %}<tr><td>{{ r.document_type }}: {{ r.title }}</td><td>{{ ('Expires ' ~ r.expiry_date) if r.expiry_date else '—' }}</td></tr>{% endfor %}
+{% if not shifts and not documents %}<tr><td colspan="2" class="muted">Nothing recorded.</td></tr>{% endif %}</tbody></table></div></section>
+</div>
+<p class="actions"><a class="btn primary" href="{{ url_for('hr.employee_export_xlsx', emp_id=e.id) }}">Download this employee's full record (Excel)</a> <a class="btn" href="{{ url_for('hr.employees') }}">← Back to employees</a></p>
+{% endblock %}

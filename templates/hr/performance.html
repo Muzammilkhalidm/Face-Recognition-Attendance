@@ -1,0 +1,15 @@
+{% extends 'hr/base.html' %}
+{% block title %}Performance{% endblock %}{% block heading %}Performance Reviews{% endblock %}
+{% block content %}
+<section class="panel"><h2>Add a review</h2>
+<form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>Employee<select name="employee_id" required>{% for e in emps %}<option value="{{ e.id }}">{{ e.full_name }}</option>{% endfor %}</select></label>
+<label>Review period<input name="review_period" placeholder="e.g. Q4 2026" required></label>
+<label>Score (1–5)<select name="score">{% for n in (5,4,3,2,1) %}<option {% if n==3 %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
+<label>Strengths<textarea name="strengths" rows="2"></textarea></label>
+<label>Areas to improve<textarea name="improvements" rows="2"></textarea></label>
+<div><button class="btn primary">Save review</button></div></form>
+<p class="hr-note">The employee sees this review in their HR workspace and gets a notification.</p></section>
+<section class="panel"><h2>All reviews</h2><div class="table-wrap"><table><thead><tr><th>Employee</th><th>Period</th><th>Score</th><th>Strengths</th><th>Improve</th><th>By</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.full_name }}</td><td>{{ r.review_period }}</td><td>{{ r.score }}/5</td><td>{{ r.strengths }}</td><td>{{ r.improvements }}</td><td>{{ r.reviewer }}</td></tr>{% else %}<tr><td colspan="6" class="muted">No reviews yet.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

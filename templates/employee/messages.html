@@ -1,0 +1,35 @@
+{% extends 'employee/base.html' %}{% block title %}Messages{% endblock %}{% block heading %}My Messages{% endblock %}{% block content %}
+{% set inbox = rows | selectattr('sender_role','in',['admin','hr']) | list %}
+{% set mine = rows | rejectattr('sender_role','in',['admin','hr']) | list %}
+
+<div class="card mb-2">
+  <h2>Inbox — from Admin &amp; HR <span class="num old">{{ inbox|length }}</span></h2>
+  <p class="muted">Messages and instructions sent to you by management.</p>
+  <div class="msg-list">
+  {% for r in inbox %}
+    <article class="msg {{ 'from-hr' if r.sender_role=='hr' else 'from-admin' }} {{ 'is-new' if r.id in new_ids }}">
+      <header><span class="msg-from">{{ 'HR' if r.sender_role=='hr' else 'Admin' }}</span><b>{{ r.subject }}</b>{% if r.id in new_ids %}<span class="badge bad">New</span>{% endif %}<small>{{ r.created_at }}</small></header>
+      <p>{{ r.body }}</p>
+      <small class="muted">Sent by {{ (r.sender_admin or 'Admin') }}</small>
+    </article>
+  {% else %}<p class="muted">Nothing from Admin or HR yet.</p>{% endfor %}
+  </div>
+</div>
+
+<div class="card mb-2"><h2>Write to management</h2><p class="muted">Your messages are private to you and the team you choose.</p>
+<form method="post" class="stack"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="field"><label>Send to</label><select name="recipient_role"><option value="Admin">Admin</option><option value="HR">HR</option><option value="CEO">CEO</option><option value="All (CEO, Admin &amp; HR)">All management</option></select></div>
+<div class="field"><label>Subject</label><input name="subject" required maxlength="150"></div>
+<div class="field"><label>Message</label><textarea name="body" required rows="4"></textarea></div><button class="btn">Send message</button></form></div>
+
+<div class="card"><h2>My sent messages &amp; replies <span class="num old">{{ mine|length }}</span></h2>
+<div class="msg-list">
+{% for r in mine %}
+  <article class="msg mine {{ 'is-new' if r.id in new_ids }}">
+    <header><span class="msg-from">You → {{ r.recipient_role }}</span><b>{{ r.subject }}</b><span class="badge {{ 'ok' if r.status=='replied' else 'gray' }}">{{ r.status }}</span>{% if r.id in new_ids %}<span class="badge bad">New reply</span>{% endif %}<small>{{ r.created_at }}</small></header>
+    <p>{{ r.body }}</p>
+    {% if r.reply %}<div class="notice reply-box"><b>{{ 'HR reply' if r.reply.startswith('[HR]') else 'Admin reply' }}</b><p>{{ r.reply[5:] if r.reply.startswith('[HR]') else r.reply }}</p></div>{% endif %}
+  </article>
+{% else %}<p class="muted">You have not sent any messages yet.</p>{% endfor %}
+</div></div>
+{% endblock %}

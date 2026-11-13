@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>{% block title %}CyberAttend{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes-premium.css', v='5') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth-premium.css', v='6') }}">
+{% include "_head_common.html" %}
+</head>
+<body class="auth-page {% block bodyclass %}{% endblock %}">
+<main class="auth-shell">
+  <section class="auth-visual" aria-label="Animated CyberAttend workplace scene">
+    <div class="visual-depth" aria-hidden="true">
+      <div class="hero-3d-stage">
+        <div class="hero-halo halo-back"></div><div class="hero-halo halo-front"></div>
+        <div class="hero-core"><div class="core-inner"><span class="core-mark">CA</span><span class="core-caption">CYBERATTEND</span></div></div>
+        <div class="hero-ring ring-a"></div><div class="hero-ring ring-b"></div><div class="hero-ring ring-c"></div>
+        <div class="hero-chip chip-a"><span class="chip-dot"></span><span class="chip-copy"><b class="role-chip-title">SMART WORKSPACE</b><small>Connected people</small></span></div>
+        <div class="hero-chip chip-b"><span class="chip-icon">✦</span><span class="chip-copy"><b>LIVE & SECURE</b><small>One seamless experience</small></span></div>
+        <div class="hero-particle particle-a"></div><div class="hero-particle particle-b"></div><div class="hero-particle particle-c"></div>
+      </div>
+      <div class="depth-orbit orbit-one"></div><div class="depth-orbit orbit-two"></div>
+      <div class="depth-glow glow-one"></div><div class="depth-glow glow-two"></div>
+      <div class="float-panel panel-attendance"><span class="panel-label">TODAY'S ATTENDANCE</span><strong>98.4%</strong><span class="panel-note">Team presence overview</span></div>
+      <div class="float-panel panel-team"><span class="panel-label">PEOPLE FIRST</span><strong>One connected team</strong><span class="panel-note">People · Purpose · Progress</span></div>
+      <div class="float-panel panel-status"><span class="status-dot"></span><span>Workspace active</span></div>
+      <div class="depth-spark spark-one"></div><div class="depth-spark spark-two"></div><div class="depth-spark spark-three"></div>
+    </div>
+    <div class="visual-copy"><div class="auth-brand">Cyber<span>Attend</span></div><div class="eyebrow">{% block visual_kicker %}PEOPLE • PURPOSE • PROGRESS{% endblock %}</div><h2>{% block visual_heading %}Great teams<br>build great things.{% endblock %}</h2><p>{% block visual_description %}A smarter, simpler workspace for your people and your organisation.{% endblock %}</p></div>
+    <div class="visual-foot">A connected workplace experience</div>
+  </section>
+  <section class="auth-content">
+    <div class="auth-card">
+      <div class="mobile-brand">Cyber<span>Attend</span></div>
+      {% with messages = get_flashed_messages(with_categories=true) %}{% for category, msg in messages %}<div class="flash {{ 'error' if category=='error' else '' }}">{{ msg }}</div>{% endfor %}{% endwith %}
+      {% block content %}{% endblock %}
+      <div class="auth-security">Secure access · CyberAttend HRMS</div>
+    </div>
+  </section>
+</main>
+<div class="signin-transition" aria-hidden="true"><div class="signin-orb"><span></span><span></span><span></span></div><div class="signin-message">SECURELY SIGNING YOU IN</div><div class="signin-submessage">Preparing your workspace…</div></div>
+<script src="{{ url_for('static', filename='js/auth-motion.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/face.js') }}"></script>
+{% block scripts %}{% endblock %}
+<script src="{{ url_for('static', filename='js/motion.js', v='2') }}"></script>
+<script src="{{ url_for('static', filename='js/mobile.js', v='1') }}" defer></script>
+</body></html>

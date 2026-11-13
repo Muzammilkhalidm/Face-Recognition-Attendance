@@ -1,0 +1,12 @@
+{% extends "employee/base.html" %}
+{% block title %}Holidays{% endblock %}
+{% block heading %}Holidays{% endblock %}
+{% block content %}
+<div class="card"><h2>Company holidays</h2>
+    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Holiday</th><th></th></tr></thead><tbody>
+    {% for h in items %}<tr><td>{{ h.holiday_date }}</td><td>{{ h.name }}</td>
+        <td>{% if h.holiday_date == today %}<span class="badge live">Today</span>{% elif h.holiday_date > today %}<span class="badge">Upcoming</span>{% else %}<span class="badge gray">Past</span>{% endif %}</td></tr>
+    {% else %}<tr><td colspan="3" class="muted">No holidays have been added yet.</td></tr>{% endfor %}
+    </tbody></table></div>
+</div>
+{% endblock %}

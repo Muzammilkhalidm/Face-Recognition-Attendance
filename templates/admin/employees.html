@@ -1,0 +1,61 @@
+{% extends "admin/base.html" %}
+{% block title %}Employees{% endblock %}
+{% block heading %}All Employees{% endblock %}
+
+{% block content %}
+<div class="grid grid-main">
+  <div class="card">
+    <h2>Create employee account</h2>
+    <p class="muted">Admin creates the username and initial password. Employee completes profile photo and 50 face samples before approval.</p>
+    <form method="POST" action="{{ url_for('_create_employee_account') }}" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field"><label>Full name</label><input name="full_name" required maxlength="120"></div>
+      <div class="field"><label>Username</label><input name="username" required minlength="3" maxlength="60"></div>
+      <div class="field"><label>Initial password</label><input type="password" name="password" required minlength="8"></div>
+      <div class="field"><label>Phone number (used if the employee forgets the password)</label><input type="tel" name="phone" required inputmode="tel" maxlength="20" placeholder="03001234567" pattern="[0-9+\- ]{10,20}"></div>
+      <div class="field"><label>Email</label><input type="email" name="email"></div>
+      <div class="field"><label>Designation</label><input name="designation"></div>
+      <div class="field"><label>Department</label><select name="department_id" required>{% for d in departments %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}</select></div>
+      <button class="btn" type="submit">Create employee login</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>50 demo employee accounts</h2>
+    <p class="muted">Creates 50 sample employee records across departments. A CSV containing temporary login credentials downloads once. Demo accounts still need real profile photos and real face enrollment; no fake biometric samples are generated.</p>
+    <form method="POST" action="{{ url_for('_generate_demo_employees') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn secondary" type="submit">Generate 50 demo employees + credentials CSV</button></form>
+    <hr><h3>Data exports</h3>
+    <p><a class="btn secondary small" href="{{ url_for('_full_records_zip') }}">Download full employee records ZIP</a></p>
+    <p><a class="btn secondary small" href="{{ url_for('_archive_database_download') }}">Download employee archive database</a></p>
+    <p><a class="btn secondary small" href="{{ url_for('_long_term_backups_zip') }}">Download 10-year backups ZIP</a></p>
+  </div>
+</div>
+<div class="card mb-2">
+    <form method="GET" class="filters" style="margin-bottom:0">
+        <div class="field"><label>Search</label><input type="text" name="q" value="{{ f_q }}" placeholder="name or username"></div>
+        <div class="field"><label>Department</label>
+            <select name="department_id"><option value="">All</option>
+            {% for d in departments %}<option value="{{ d.id }}" {% if f_dept == d.id %}selected{% endif %}>{{ d.name }}</option>{% endfor %}</select></div>
+        <div class="field"><label>Status</label>
+            <select name="status"><option value="">All</option>
+            {% for v, l in [('approved','Approved'),('pending','Pending approval'),('face_pending','Face not registered'),('rejected','Rejected')] %}
+            <option value="{{ v }}" {% if f_status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></div>
+        <button class="btn small" type="submit">Filter</button>
+        <a class="btn secondary small" href="{{ url_for('admin_employees') }}">Reset</a>
+    </form>
+</div>
+<div class="card">
+    <div class="row-between"><h2>Employees ({{ employees|length }})</h2><a class="btn secondary small" href="{{ url_for('admin_employees_csv') }}">Export employee directory CSV</a></div>
+    <div class="table-wrap"><table>
+        <thead><tr><th>ID</th><th>Name</th><th>Department</th><th>Samples</th><th>Status</th><th>Registered</th><th></th></tr></thead>
+        <tbody>
+        {% for e in employees %}
+            <tr><td>#{{ '%03d'|format(e.id) }}</td>
+                <td><a href="{{ url_for('admin_employee_detail', emp_id=e.id) }}">{{ e.full_name }}</a><br><span class="muted" style="font-size:11px">@{{ e.username }}</span></td>
+                <td><span class="badge gray">{{ e.department_name }}</span></td><td>{{ e.samples_captured }}</td>
+                <td>{% include "admin/_status_badge.html" %}</td><td>{{ e.created_at|dt }}</td>
+                <td class="right">{% include "admin/_employee_row_actions.html" %}</td></tr>
+        {% else %}<tr><td colspan="7" class="muted">No employees found.</td></tr>{% endfor %}
+        </tbody>
+    </table></div>
+</div>
+{% endblock %}

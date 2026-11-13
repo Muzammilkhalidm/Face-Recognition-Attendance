@@ -1,0 +1,79 @@
+{% from "_icons.html" import icon, brandmark %}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>{% block title %}HR{% endblock %} - CyberAttend HR</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes-premium.css', v='5') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/workspace-gold.css', v='5') }}">
+{% include "_head_common.html" %}
+</head>
+<body class="hr">
+<script>(function(){try{var t=localStorage.getItem("cyberattend-appearance");if(["light","dark","blue","purple","red","gold"].indexOf(t)>-1)document.body.setAttribute("data-theme",t);}catch(e){}})();</script>
+<div class="layout">
+    <div class="side-backdrop" data-sidebar-backdrop></div>
+    <div class="sidebar">
+        <div class="brand">{{ brandmark() }}<div>Cyber<span>HR</span></div></div>
+        <div class="who">HR staff<b>{{ g.hr.full_name }}</b></div>
+        <a class="nav-item {% if active=='dashboard' %}active{% endif %}" href="{{ url_for('hr.dashboard') }}">{{ icon('dashboard') }}HR Dashboard</a>
+        <a class="nav-item {% if active=='employees' %}active{% endif %}" href="{{ url_for('hr.employees') }}">{{ icon('employees') }}Employees</a>
+        <a class="nav-item {% if active=='leaves' %}active{% endif %}" href="{{ url_for('hr.leaves') }}">{{ icon('leaves') }}Leave Requests{% if hr_counts.leaves %}<span class="count">{{ hr_counts.leaves }}</span>{% endif %}</a>
+        <a class="nav-item {% if active=='attendance' %}active{% endif %}" href="{{ url_for('hr.attendance') }}">{{ icon('attendance') }}Attendance</a>
+        <a class="nav-item {% if active=='performance' %}active{% endif %}" href="{{ url_for('hr.performance') }}">{{ icon('approvals') }}Performance</a>
+        <a class="nav-item {% if active=='projects' %}active{% endif %}" href="{{ url_for('hr.projects') }}">{{ icon('tasks') }}Projects</a>
+        <a class="nav-item {% if active=='shifts' %}active{% endif %}" href="{{ url_for('hr.shifts') }}">{{ icon('clock') }}Shifts</a>
+        <a class="nav-item {% if active=='documents' %}active{% endif %}" href="{{ url_for('hr.documents') }}">{{ icon('file') }}Documents{% if hr_counts.docs %}<span class="count">{{ hr_counts.docs }}</span>{% endif %}</a>
+        <a class="nav-item {% if active=='expenses' %}active{% endif %}" href="{{ url_for('hr.expenses') }}">{{ icon('approvals') }}Expense Claims{% if hr_counts.expenses %}<span class="count">{{ hr_counts.expenses }}</span>{% endif %}</a>
+        <a class="nav-item {% if active=='payroll' %}active{% endif %}" href="{{ url_for('hr.payroll') }}">{{ icon('wallet') }}Payroll (view)</a>
+        <a class="nav-item {% if active=='recruitment' %}active{% endif %}" href="{{ url_for('hr.recruitment') }}">{{ icon('profile') }}Recruitment</a>
+        <a class="nav-item {% if active=='certificates' %}active{% endif %}" href="{{ url_for('hr.certificates') }}">{{ icon('award') }}Certificates</a>
+        <a class="nav-item {% if active=='messages' %}active{% endif %}" href="{{ url_for('hr.messages') }}">{{ icon('messages') }}Employee Messages{% if hr_counts.messages %}<span class="count">{{ hr_counts.messages }}</span>{% endif %}</a>
+        <a class="nav-item" href="{{ url_for('hr.report_xlsx') }}">{{ icon('dataset') }}HR Report (Excel)</a>
+        <a class="nav-item" href="{{ url_for('hr.export_all_xlsx') }}">{{ icon('database') }}Complete HR Data (Excel)</a>
+        {% if g.hr.is_main %}<a class="nav-item {% if active=='team' %}active{% endif %}" href="{{ url_for('hr.team') }}">{{ icon('admins') }}Temporary HR Assignments</a>{% endif %}
+        <a class="nav-item {% if active=='account' %}active{% endif %}" href="{{ url_for('hr.account') }}">{{ icon('profile') }}My Account</a>
+        <div class="nav-sep"></div>
+        <a class="nav-item" href="{{ url_for('hr.logout') }}">{{ icon('logout') }}Log out</a>
+    </div>
+    <div class="main">
+        <div class="topbar">
+            <div class="title-wrap"><button type="button" class="menu-btn" data-sidebar-toggle aria-label="Toggle menu" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><h1>{% block heading %}HR Dashboard{% endblock %}</h1></div>
+            <div class="user-tag">HR staff: {{ g.hr.full_name }}</div>
+            <div class="theme-control" aria-label="Choose appearance">
+                <button type="button" class="theme-trigger" data-theme-trigger aria-expanded="false">Appearance <span aria-hidden="true">▾</span></button>
+                <div class="theme-menu" data-theme-menu hidden>
+                    <div class="theme-menu-title">Choose your theme</div>
+                    <button type="button" data-theme-choice="light"><i class="swatch swatch-light"></i>Light</button>
+                    <button type="button" data-theme-choice="dark"><i class="swatch swatch-dark"></i>Dark</button>
+                    <button type="button" data-theme-choice="blue"><i class="swatch swatch-blue"></i>Blue</button>
+                    <button type="button" data-theme-choice="purple"><i class="swatch swatch-purple"></i>Purple</button>
+                    <button type="button" data-theme-choice="red"><i class="swatch swatch-red"></i>Red</button>
+                    <button type="button" data-theme-choice="gold"><i class="swatch swatch-gold"></i>Gold</button>
+                </div>
+            </div>
+        </div>
+        <section class="workspace-hero" data-workspace-hero data-section="{{ active|default('dashboard') }}" aria-live="polite">
+            <div class="workspace-hero-copy"><span class="workspace-hero-kicker">CYBERATTEND WORKSPACE</span>
+                <h2 data-hero-title>One connected workplace</h2><p data-hero-description>Everything your team needs, in one place.</p>
+            </div><div class="workspace-hero-art" role="img" aria-label="CyberAttend workplace illustration"><span data-hero-symbol>✦</span></div>
+            <div class="workspace-hero-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </section>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, msg in messages %}
+                <div class="flash {{ 'error' if category=='error' else '' }}">{{ msg }}</div>
+            {% endfor %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+        <footer class="note">CyberAttend &mdash; HR Portal</footer>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+{% block scripts %}{% endblock %}
+<script src="{{ url_for('static', filename='js/theme-switcher.js') }}"></script>
+<script src="{{ url_for('static', filename='js/motion.js', v='2') }}"></script>
+<script src="{{ url_for('static', filename='js/mobile.js', v='1') }}" defer></script>
+<script src="{{ url_for('static', filename='js/workspace-hero.js', v='2') }}"></script>
+</body>
+</html>

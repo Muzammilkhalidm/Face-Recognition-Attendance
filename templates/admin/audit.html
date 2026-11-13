@@ -1,0 +1,13 @@
+{% extends "admin/base.html" %}
+{% block title %}Activity Log{% endblock %}
+{% block heading %}Activity Log{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="task-top"><div><h2>What admins did <span class="badge violet">Main admin only</span></h2><p class="muted">Every change made by any admin (approvals, deletes, settings, replies...). Passwords are never stored here.</p></div>
+        <form method="GET" class="filters" style="margin:0"><div class="field"><input name="q" value="{{ q }}" placeholder="Search admin / action"></div><button class="btn small" type="submit">Search</button></form></div>
+    <div class="table-wrap"><table><thead><tr><th>When</th><th>Admin</th><th>Action</th><th>Details</th><th>IP</th></tr></thead><tbody>
+    {% for a in items %}<tr><td>{{ a.created_at|dt }}</td><td>{{ a.admin }}</td><td><span class="badge gray">{{ a.action }}</span></td><td><small>{{ a.detail }}</small></td><td><small>{{ a.ip }}</small></td></tr>
+    {% else %}<tr><td colspan="5" class="muted">Nothing recorded yet.</td></tr>{% endfor %}
+    </tbody></table></div>
+</div>
+{% endblock %}

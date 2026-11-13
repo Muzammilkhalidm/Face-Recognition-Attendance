@@ -1,0 +1,42 @@
+{% extends 'hr/base.html' %}
+{% block title %}Documents{% endblock %}{% block heading %}Employee Documents{% endblock %}
+{% block content %}
+<section class="panel"><h2>Add a document record</h2>
+<form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>Employee<select name="employee_id" required>{% for e in emps %}<option value="{{ e.id }}">{{ e.full_name }}</option>{% endfor %}</select></label>
+<label>Title<input name="title" required></label>
+<label>Type<select name="document_type" id="doc-type">{% for t in types %}<option>{{ t }}</option>{% endfor %}</select></label>
+<label><span id="id-label">CNIC / ID number</span><input name="id_number" id="id-number" maxlength="40" inputmode="numeric" autocomplete="off" placeholder="35202-1234567-1"></label>
+<label>Expiry date<input type="date" name="expiry_date"></label>
+<label>Link to file (Drive / etc.)<input name="reference_url" placeholder="https://"></label>
+<label>Note<input name="note"></label>
+<div><button class="btn primary">Add</button></div></form></section>
+<section class="panel"><h2>Records</h2><div class="table-wrap"><table><thead><tr><th>Employee</th><th>Document</th><th>Type</th><th>CNIC / ID no.</th><th>Expiry</th><th>Link</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.full_name }}</td><td>{{ r.title }}<div class="table-subtext">{{ r.note }}</div></td><td>{{ r.document_type }}</td><td>{{ r.id_number or '—' }}</td>
+<td>{% if not r.expiry_date %}—{% elif r.expiry_date < today %}<span class="badge bad">Expired {{ r.expiry_date }}</span>{% elif r.expiry_date <= soon %}<span class="badge warn">Expires {{ r.expiry_date }}</span>{% else %}{{ r.expiry_date }}{% endif %}</td>
+<td>{% if r.reference_url and (r.reference_url.startswith('http://') or r.reference_url.startswith('https://')) %}<a href="{{ r.reference_url }}" target="_blank" rel="noopener">Open</a>{% else %}—{% endif %}</td>
+<td><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="delete"><input type="hidden" name="doc_id" value="{{ r.id }}"><button class="btn small danger" onclick="return confirm('Remove this record?')">Remove</button></form></td></tr>
+{% else %}<tr><td colspan="7" class="muted">No document records.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var t=document.getElementById('doc-type'), n=document.getElementById('id-number'), l=document.getElementById('id-label');
+  if(!t||!n) return;
+  function isCnic(){return t.value==='CNIC / ID';}
+  function sync(){
+    l.textContent=isCnic()?'CNIC number (13 digits)':'Document / reference number';
+    n.placeholder=isCnic()?'35202-1234567-1':'Optional';
+    n.inputMode=isCnic()?'numeric':'text'; n.required=isCnic();
+  }
+  n.addEventListener('input',function(){
+    if(!isCnic()) return;
+    var d=n.value.replace(/\D/g,'').slice(0,13), o=d.slice(0,5);
+    if(d.length>5) o+='-'+d.slice(5,12);
+    if(d.length>12) o+='-'+d.slice(12);
+    n.value=o;
+  });
+  t.addEventListener('change',sync); sync();
+})();
+</script>
+{% endblock %}

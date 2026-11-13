@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ r.full_name }} (archived){% endblock %}
+{% block heading %}{{ r.full_name }} <span class="badge violet">Archived</span>{% endblock %}
+{% block content %}
+<p><a class="btn secondary small" href="{{ url_for('admin_archive') }}">&larr; Back to archive</a>
+   <a class="btn small" href="{{ url_for('admin_archive_faces_zip', archive_id=r.archive_id) }}">Download all faces + record (ZIP)</a></p>
+<div class="grid grid-eq mb-2">
+    <div class="card">
+        <h2>Profile</h2>
+        <div class="profile-header">
+            {% if faces %}<img class="profile-avatar large" src="{{ url_for('admin_archive_face', emp_id=r.employee_id, name=faces[0]) }}" alt="">
+            {% else %}<div class="profile-avatar large placeholder">{{ r.full_name[:1]|upper }}</div>{% endif %}
+            <div><strong>{{ r.full_name }}</strong><p class="muted">{{ emp.designation or 'Team member' }}</p></div>
+        </div>
+        <div class="kv">
+            <div class="k">Employee ID</div><div>#{{ '%03d'|format(r.employee_id) }}</div>
+            <div class="k">Archive ID</div><div>{{ r.archive_id }}</div>
+            <div class="k">Username</div><div>{{ r.username }}</div>
+            <div class="k">Department</div><div><span class="badge gray">{{ r.department }}</span></div>
+            <div class="k">Status when deleted</div><div>{{ r.status|replace('_',' ')|title }}</div>
+            <div class="k">Email</div><div>{{ emp.email or '—' }}</div>
+            <div class="k">Phone</div><div>{{ emp.phone or '—' }}</div>
+            <div class="k">Employment type</div><div>{{ emp.employment_type or '—' }}</div>
+            <div class="k">Joining date</div><div>{{ emp.joining_date or '—' }}</div>
+            <div class="k">Registered</div><div>{{ emp.created_at|dt if emp.created_at else '—' }}</div>
+            <div class="k">Approved</div><div>{{ emp.approved_at|dt if emp.approved_at else '—' }}</div>
+            <div class="k">Archived on</div><div>{{ r.archived_at|dt }}</div>
+            <div class="k">Keep until</div><div><b>{{ r.retention_until[:10] }}</b> &middot; {{ '{:,}'.format(r.days_left) if r.days_left is not none else '' }} days left</div>
+            <div class="k">Face samples</div><div>{{ faces|length }} / 50</div>
+            <div class="k">Source</div><div>{{ r.record.source or 'Deleted from live system' }}</div>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Stored data</h2>
+        <div class="kv">
+            {% for label, items in modules %}<div class="k">{{ label }}</div><div>{{ items|length }} record{{ '' if items|length==1 else 's' }}</div>{% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="card mb-2">
+    <h2>All face samples ({{ faces|length }})</h2>
+    {% if faces %}
+    <div class="arch-gallery">
+        {% for f in faces %}<a href="{{ url_for('admin_archive_face', emp_id=r.employee_id, name=f) }}" target="_blank" rel="noopener"><img loading="lazy" src="{{ url_for('admin_archive_face', emp_id=r.employee_id, name=f) }}" alt="sample {{ loop.index }}"><span>{{ loop.index }}</span></a>{% endfor %}
+    </div>
+    {% else %}<p class="muted">This employee never completed face registration, so there are no face samples.</p>{% endif %}
+    <p class="scan-note" style="text-align:left">Stored in <code>archived_faces/{{ r.employee_id }}/</code>. These images are kept for records only and are never used by the live face recogniser.</p>
+</div>
+
+{% for label, items in modules if items %}
+<div class="card mb-2">
+    <h2>{{ label }} ({{ items|length }})</h2>
+    <div class="table-wrap"><table>
+        <thead><tr>{% for k in items[0].keys() %}<th>{{ k|replace('_',' ')|title }}</th>{% endfor %}</tr></thead>
+        <tbody>{% for it in items %}<tr>{% for k in items[0].keys() %}<td>{{ it[k] if it[k] is not none else '' }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+    </table></div>
+</div>
+{% endfor %}
+
+<div class="card">
+    <h2>Raw archived record (JSON)</h2>
+    <details><summary class="muted" style="cursor:pointer">Show everything saved for this employee</summary>
+    <pre class="arch-json">{{ r.record|tojson(indent=2) }}</pre></details>
+</div>
+{% endblock %}

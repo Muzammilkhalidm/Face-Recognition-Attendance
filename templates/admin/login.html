@@ -1,0 +1,13 @@
+{% extends "public_base.html" %}
+{% block bodyclass %}
+{% block visual_kicker %}ADMINISTRATION{% endblock %}
+{% block visual_heading %}Lead with clarity.<br>Move forward.{% endblock %}
+{% block visual_description %}A clear view of your people, performance and organisation-wide operations.{% endblock %}admin-auth{% endblock %}
+{% block title %}Admin Login | CyberAttend{% endblock %}
+{% block content %}
+<div class="auth-kicker">ADMINISTRATION</div><h1>Administrator sign in</h1><p class="sub">Access the management workspace using your authorised credentials.</p>
+<form method="POST" autocomplete="off"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="field"><label for="username">Admin username</label><input id="username" type="text" name="username" placeholder="Enter admin username" required autofocus autocomplete="username"></div>
+<div class="field"><label for="password">Password</label><input id="password" type="password" name="password" placeholder="Enter your password" required autocomplete="current-password"></div>
+<button class="btn auth-submit" type="submit">Secure sign in <span aria-hidden="true">→</span></button></form>
+{% endblock %}

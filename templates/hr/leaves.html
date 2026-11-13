@@ -1,0 +1,22 @@
+{% extends 'hr/base.html' %}
+{% block title %}Leave Requests{% endblock %}{% block heading %}Leave Requests{% endblock %}
+{% block content %}
+<section class="panel"><h2>Leave requests</h2>
+<p class="row-form"><a class="btn small {{ '' if status=='' else 'secondary' }}" href="{{ url_for('hr.leaves') }}">All</a>
+<a class="btn small {{ '' if status=='pending' else 'secondary' }}" href="{{ url_for('hr.leaves', status='pending') }}">Pending</a>
+<a class="btn small {{ '' if status=='approved' else 'secondary' }}" href="{{ url_for('hr.leaves', status='approved') }}">Approved</a>
+<a class="btn small {{ '' if status=='rejected' else 'secondary' }}" href="{{ url_for('hr.leaves', status='rejected') }}">Rejected</a></p>
+<div class="table-wrap"><table><thead><tr><th>Employee</th><th>Date</th><th>Type</th><th>Reason</th><th>Status</th><th>Salary deduction</th><th>Action</th></tr></thead><tbody>
+{% for r in reqs %}<tr><td>{{ r.full_name }}</td><td>{{ r.leave_date }}</td><td>{{ r.leave_type }} ({{ r.units }})</td><td>{{ r.reason or '—' }}</td>
+<td>{{ r.status|title }}{% if r.reviewed_by %}<div class="table-subtext">{{ r.reviewed_by }}</div>{% endif %}</td>
+<td>{% if r.status=='approved' %}{% if r.salary_deduction and r.salary_deduction>0 %}Rs {{ '{:,.0f}'.format(r.salary_deduction) }} <span class="table-subtext">set by admin</span>{% else %}<span class="muted">None / admin deciding</span>{% endif %}{% else %}—{% endif %}</td>
+<td>{% if r.status=='pending' %}<form method="post" class="row-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="review"><input type="hidden" name="request_id" value="{{ r.id }}"><input name="note" placeholder="Note (optional)"><button class="btn small" name="decision" value="approved">Approve</button><button class="btn small secondary" name="decision" value="rejected">Reject</button></form>{% else %}—{% endif %}</td></tr>
+{% else %}<tr><td colspan="7" class="muted">No leave requests.</td></tr>{% endfor %}</tbody></table></div>
+<p class="hr-note">HR approves or rejects leave. Only the admin decides how much salary is deducted for approved leave.</p></section>
+
+<section class="panel"><h2>Annual leave allowance</h2>
+<div class="table-wrap"><table><thead><tr><th>Employee</th><th>Used</th><th>Remaining</th><th>Yearly allowance</th></tr></thead><tbody>
+{% for b in balances %}<tr><td>{{ b.full_name }}</td><td>{{ b.annual_used|round(1) }}</td><td>{{ (b.annual_total-b.annual_used)|round(1) }}</td>
+<td><form method="post" class="row-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="allowance"><input type="hidden" name="employee_id" value="{{ b.id }}"><input type="number" name="annual_total" min="0" max="365" value="{{ b.annual_total }}" style="width:80px"><button class="btn small">Save</button></form></td></tr>
+{% endfor %}</tbody></table></div></section>
+{% endblock %}

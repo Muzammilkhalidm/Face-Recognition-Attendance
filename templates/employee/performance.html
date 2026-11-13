@@ -1,0 +1,66 @@
+{% extends "employee/base.html" %}
+{% block title %}My Performance{% endblock %}
+{% block heading %}My Performance{% endblock %}
+{% set labels = {5:'Outstanding',4:'Exceeds expectations',3:'Meets expectations',2:'Needs improvement',1:'Unsatisfactory'} %}
+{% block content %}
+{% if latest %}
+<section class="perf-hero">
+    <div class="perf-ring" style="--p: {{ (latest.score * 20) }}"><b>{{ latest.score }}<small>out of 5</small></b></div>
+    <div>
+        <span class="perf-kicker">LATEST REVIEW &middot; {{ latest.review_period|upper }}</span>
+        <h2>{{ labels.get(latest.score, 'Reviewed') }}</h2>
+        <div class="perf-stars" aria-label="{{ latest.score }} out of 5">{% for i in range(1,6) %}<i class="{{ 'on' if i <= latest.score }}">★</i>{% endfor %}</div>
+        <p>Reviewed by <b>{{ latest.reviewer or 'HR' }}</b> on {{ latest.created_at|dt }}</p>
+    </div>
+</section>
+
+<div class="perf-stats">
+    <div class="perf-stat"><span>Total reviews</span><b>{{ reviews|length }}</b></div>
+    <div class="perf-stat"><span>Average score</span><b>{{ avg }} / 5</b></div>
+    <div class="perf-stat"><span>Best score</span><b>{{ reviews|map(attribute='score')|max }} / 5</b></div>
+    <div class="perf-stat"><span>Latest period</span><b>{{ latest.review_period }}</b></div>
+</div>
+
+<div class="perf-grid">
+    <div class="perf-box">
+        <h3>What HR said about your latest review</h3>
+        <div class="perf-two">
+            <div class="perf-note good"><h4>&#10003; Strengths</h4><p>{{ latest.strengths or 'No comments added.' }}</p></div>
+            <div class="perf-note grow"><h4>&#8593; Areas to improve</h4><p>{{ latest.improvements or 'No comments added.' }}</p></div>
+        </div>
+    </div>
+    <div class="perf-box">
+        <h3>Score trend</h3>
+        {% set chron = (reviews|reverse|list)[-8:] %}
+        <div class="perf-bars">
+            {% for r in chron %}<div class="perf-bar" title="{{ r.review_period }}: {{ r.score }}/5"><b>{{ r.score }}</b><i style="height: {{ r.score * 20 }}%"></i><small>{{ r.review_period }}</small></div>{% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="perf-box">
+    <h3>Review history</h3>
+    <div class="perf-timeline">
+        {% for r in reviews %}
+        <article class="perf-item">
+            <div class="perf-score"><b>{{ r.score }}</b><small>/ 5</small></div>
+            <div>
+                <h4>{{ r.review_period }} <span class="perf-badge s{{ r.score }}">{{ labels.get(r.score, '') }}</span></h4>
+                <div class="perf-two">
+                    <div class="perf-note good"><h4>Strengths</h4><p>{{ r.strengths or '—' }}</p></div>
+                    <div class="perf-note grow"><h4>Areas to improve</h4><p>{{ r.improvements or '—' }}</p></div>
+                </div>
+                <div class="perf-meta">By {{ r.reviewer or 'HR' }} &middot; {{ r.created_at|dt }}</div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="perf-empty">
+    <div class="big">&#127942;</div>
+    <h3>No performance review yet</h3>
+    <p>When HR adds your performance review you will get a notification and it will appear here with your score, strengths and areas to improve.</p>
+</div>
+{% endif %}
+{% endblock %}

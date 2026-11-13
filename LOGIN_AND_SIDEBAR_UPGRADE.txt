@@ -1,0 +1,39 @@
+CYBERATTEND - LOGIN & SIDEBAR UPGRADE
+====================================
+
+NEW LOGIN URLS (same Flask application)
+- Employee:  /employeelogin   (legacy /login remains active)
+- Admin:     /adminlogin      (legacy /admin/login remains active)
+- HR:        /hrlogin         (legacy /hr/login remains active)
+
+The Admin and HR links have been removed from the employee login screen. The login pages
+also do not display links to the other roles. The routes are not public shortcuts: each
+POST still uses the existing role-specific authentication, password verification and
+rate limiting. Existing dashboards and database records are retained.
+
+CUSTOM DOMAIN NOTE
+A path such as /adminlogin is a route on your existing website. A hostname such as
+adminlogin.pk is a separate domain and must be registered, pointed to your hosting
+server with DNS, and configured in your hosting/web-server setup. To use separate
+hostnames on one Flask app, configure host routing/reverse proxy rules and TLS. Do not
+point a domain to localhost; localhost only works on the computer running the app.
+
+SIDEBAR IMPROVEMENTS
+- Desktop sidebar now slides completely out of view and the content expands into its
+  place; clicking the menu control opens it again.
+- Mobile sidebar remains a drawer with backdrop and Escape-to-close support.
+- Sidebar's own scroll position is saved during navigation so the menu does not jump
+  back to the top when changing dashboard sections.
+- Desktop open/closed preference is remembered in the browser.
+
+LOGIN DESIGN
+- Shared premium sign-in layout for Employee, Admin and HR.
+- New generated corporate office artwork with a standing professional.
+- Responsive mobile layout; the artwork panel is hidden on narrow screens to keep the
+  login form readable and usable.
+
+Run as before from this folder:
+    pip install -r requirements.txt
+    python app.py
+
+Open the relevant URL using http://127.0.0.1:5000/ followed by the route above.

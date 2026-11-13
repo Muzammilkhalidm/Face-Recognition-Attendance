@@ -1,0 +1,11 @@
+{% extends 'hr/base.html' %}
+{% block title %}My Account{% endblock %}{% block heading %}My Account{% endblock %}
+{% block content %}
+<section class="panel"><h2>{{ g.hr.full_name }} <span class="muted">({{ g.hr.username }})</span></h2>
+<p class="hr-note">Last sign-in: {{ g.hr.last_login|dt if g.hr.last_login else 'first time' }}</p>
+<form method="post" class="form-grid" autocomplete="off"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>Current password<input type="password" name="current_password" required autocomplete="current-password"></label>
+<label>New password (min 8)<input type="password" name="new_password" required minlength="8" autocomplete="new-password"></label>
+<label>Confirm new password<input type="password" name="confirm_password" required minlength="8" autocomplete="new-password"></label>
+<div><button class="btn primary">Change password</button></div></form></section>
+{% endblock %}

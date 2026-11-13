@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block heading %}Notifications{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="task-top"><h2>Your notifications ({{ items|length }})</h2>
+        <form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn secondary small" type="submit">Mark all as read</button></form></div>
+    {% for n in items %}
+    <div class="notice"><div class="row"><span class="num {{ '' if not n.is_read else 'old' }}">{{ loop.index }}</span>
+        <h4>{% if n.url %}<a href="{{ n.url }}">{{ n.title }}</a>{% else %}{{ n.title }}{% endif %}</h4>
+        <span class="badge gray">{{ n.kind }}</span>{% if not n.is_read %}<span class="badge warn">New</span>{% endif %}</div>
+        {% if n.body %}<p>{{ n.body }}</p>{% endif %}<small class="muted">{{ n.created_at|dt }}</small></div>
+    {% else %}<p class="muted">No notifications yet.</p>{% endfor %}
+</div>
+{% endblock %}

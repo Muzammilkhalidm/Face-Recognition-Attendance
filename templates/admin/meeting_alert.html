@@ -1,0 +1,43 @@
+{% extends "admin/base.html" %}
+{% block title %}Meeting Alert{% endblock %}
+{% block heading %}Meeting Alert{% endblock %}
+{% block content %}
+<div class="alert-hero">
+    <form method="POST" class="alert-form" onsubmit="return confirm('Ring the alarm now for the selected employees?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="ring">
+        <h2>&#128276; Ring a meeting alarm</h2>
+        <p class="sub">One click and the alarm rings at the same moment on every selected employee's mobile and computer, until they tap "I'm coming".</p>
+        <div class="field"><label>Who should hear it?</label>
+            <select name="department_id"><option value="">All departments (everyone)</option>
+            {% for d in departments %}<option value="{{ d.id }}">{{ d.name }} department</option>{% endfor %}</select></div>
+        <div class="alert-chips">
+            <button type="button" data-fill="Meeting starting now|Please join in the meeting room.">Meeting now</button>
+            <button type="button" data-fill="Urgent meeting|Everyone please gather immediately.">Urgent</button>
+            <button type="button" data-fill="Online meeting|Please join the online meeting link.">Online</button>
+        </div>
+        <div class="field"><label>Title</label><input type="text" id="al-title" name="title" maxlength="120" value="Meeting starting now"></div>
+        <div class="field"><label>Message (optional)</label><input type="text" id="al-msg" name="message" maxlength="300" placeholder="e.g. Conference room, 3rd floor"></div>
+        <button class="btn-ring" type="submit">&#128680; RING ALARM NOW</button>
+    </form>
+    <div class="card">
+        <h2>How it works</h2>
+        <p class="muted">Employees need to have CyberAttend open (browser tab or phone) and tap once on the page to allow sound. The alarm shows full-screen, rings loudly, vibrates on phones and keeps ringing until the employee taps "I'm coming" or you stop it (auto-stops after {{ 15 }} minutes).</p>
+        <p class="muted">If SMS is set up, employees with a phone number also get a text message.</p>
+    </div>
+</div>
+<div class="card" style="margin-top:20px">
+    <h2>Recent alarms</h2>
+    <div class="table-wrap"><table>
+        <thead><tr><th>Time</th><th>For</th><th>Title</th><th>Heard / Confirmed</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        {% for a in alarms %}
+        <tr><td>{{ a.created_at|dt }}</td><td><span class="badge gray">{{ a.department_name }}</span></td>
+            <td><b>{{ a.title }}</b>{% if a.message %}<br><small class="muted">{{ a.message }}</small>{% endif %}<br><small class="muted">by {{ a.created_by }}</small></td>
+            <td>{{ a.acked }} of {{ a.targets }} confirmed</td>
+            <td>{% if a.ringing %}<span class="alert-state on">RINGING</span>{% elif a.stopped %}<span class="alert-state off">Stopped</span>{% else %}<span class="alert-state off">Finished</span>{% endif %}</td>
+            <td>{% if a.ringing %}<form method="POST" class="inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="stop"><input type="hidden" name="alarm_id" value="{{ a.id }}"><button class="btn danger small">Stop alarm</button></form>{% endif %}</td></tr>
+        {% else %}<tr><td colspan="6" class="muted">No alarms sent yet.</td></tr>{% endfor %}
+        </tbody></table></div>
+</div>
+<script>document.querySelectorAll('[data-fill]').forEach(function(b){b.addEventListener('click',function(){var p=b.dataset.fill.split('|');document.getElementById('al-title').value=p[0];document.getElementById('al-msg').value=p[1];});});</script>
+{% endblock %}

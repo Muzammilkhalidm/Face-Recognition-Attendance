@@ -1,0 +1,118 @@
+{% extends "employee/base.html" %}
+{% block title %}My Work{% endblock %}{% block heading %}My Work & Tasks{% endblock %}
+{% block content %}
+{# --- quick numbers: HR projects + admin tasks together --- #}
+{% set all_open = (tasks | rejectattr('status','in',['Completed','Rejected','Proposed']) | list | length) + (projects | rejectattr('status','equalto','Completed') | list | length) %}
+{% set all_done = (tasks | selectattr('status','equalto','Completed') | list | length) + (projects | selectattr('status','equalto','Completed') | list | length) %}
+{% set all_overdue = (tasks | selectattr('due_date') | rejectattr('status','in',['Completed','Rejected']) | selectattr('due_date','lt',today) | list | length) + (projects | selectattr('due_date') | rejectattr('status','equalto','Completed') | selectattr('due_date','lt',today) | list | length) %}
+<div class="work-stats">
+    <div class="work-stat"><b>{{ all_open }}</b><span>To do / ongoing</span></div>
+    <div class="work-stat"><b>{{ all_done }}</b><span>Completed</span></div>
+    <div class="work-stat {{ 'late' if all_overdue }}"><b>{{ all_overdue }}</b><span>Overdue</span></div>
+    <div class="work-stat"><b>{{ projects|length }}</b><span>From HR</span></div>
+</div>
+
+<div class="work-bar">
+    <div class="work-filter" role="tablist" aria-label="Filter work">
+        <button type="button" class="chip active" data-filter="all">All</button>
+        <button type="button" class="chip" data-filter="todo">To do</button>
+        <button type="button" class="chip" data-filter="doing">In progress</button>
+        <button type="button" class="chip" data-filter="done">Done</button>
+    </div>
+    <a class="btn secondary small" href="{{ url_for('employee_tasks_xlsx') }}">Download my sheet</a>
+</div>
+
+{# ================= PROJECTS FROM HR / ADMIN ================= #}
+<div class="card mb-2">
+    <h2>Work from HR &amp; Admin — projects{% if new_ids %} <span class="num">{{ new_ids|length }}</span> <small class="muted">new</small>{% endif %}</h2>
+    <p class="muted">Everything HR assigns to you appears here. Update your status and progress so HR can follow your work.</p>
+    <div class="task-list" id="project-list">
+    {% for p in projects %}
+        {% set grp = 'done' if p.status=='Completed' else ('doing' if p.status in ('In Progress','Blocked') else 'todo') %}
+        {% set late = p.due_date and p.due_date < today and p.status != 'Completed' %}
+        <article class="task-card work-item {{ 'is-new' if (-p.id) in new_ids }}" data-group="{{ grp }}">
+            <div class="task-top">
+                <div>
+                    <h3>{% if (-p.id) in new_ids %}<span class="badge bad">New</span> {% endif %}{{ p.title }}</h3>
+                    <p class="muted">{{ p.description or 'No additional details' }}</p>
+                </div>
+                <div class="work-badges">
+                    <span class="badge {{ 'ok' if p.status=='Completed' else ('bad' if p.status=='Blocked' else ('warn' if p.status=='Planned' else 'violet')) }}">{{ p.status }}</span>
+                    <span class="badge gray">{{ p.priority }}</span>
+                </div>
+            </div>
+            <div class="task-meta">
+                <span>From: <b>{{ p.created_by or 'HR' }}</b></span>
+                <span>Start: {{ p.start_date or '—' }}</span>
+                <span class="{{ 'late-text' if late }}">Deadline: {{ p.due_date or 'Not set' }}{% if late %} · overdue{% endif %}</span>
+            </div>
+            <div class="progress" aria-label="Progress {{ p.progress }} percent"><span style="width: {{ p.progress or 0 }}%"></span><em>{{ p.progress or 0 }}%</em></div>
+            <form method="POST" action="{{ url_for('employee_project_update', project_id=p.id) }}" class="task-update">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="field"><label>Status</label>
+                    <select name="status">{% for s in ('Planned','In Progress','Blocked','Completed') %}<option {{ 'selected' if p.status==s }}>{{ s }}</option>{% endfor %}</select></div>
+                <div class="field"><label>Progress %</label><input type="number" name="progress" min="0" max="100" value="{{ p.progress or 0 }}" inputmode="numeric"></div>
+                <div class="field wide"><label>Note for HR (what is done / what is blocking)</label><input name="employee_note" value="{{ p.employee_note or '' }}" maxlength="2000" placeholder="Short update"></div>
+                <button class="btn small" type="submit">Save update</button>
+            </form>
+            {% if p.status == 'Completed' %}
+            <form method="POST" action="{{ url_for('employee_project_delete', project_id=p.id) }}" class="inline-form" onsubmit="return confirm('Remove this project from your list? It stays saved in your work sheet.');"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger small" type="submit">Remove from my list</button></form>
+            {% endif %}
+        </article>
+    {% else %}<p class="muted">No projects from HR yet. When HR assigns you work it will show up here and you will get a notification.</p>{% endfor %}
+    </div>
+</div>
+
+{# ================= TASKS FROM ADMIN + MY PROPOSALS ================= #}
+<div class="card mb-2">
+    <div class="task-top"><div><h2>My tasks ({{ tasks|length }})</h2><p class="muted">Tasks from admin and work you proposed. Deleting a finished task only clears it from this page.</p></div></div>
+    <div class="task-list" id="task-list">
+    {% for t in tasks %}
+        {% set grp = 'done' if t.status in ('Completed','Rejected') else ('doing' if t.status=='In Progress' else 'todo') %}
+        {% set late = t.due_date and t.due_date < today and grp != 'done' %}
+        <article class="task-card work-item {{ 'is-new' if t.id in new_ids }}" data-group="{{ grp }}">
+            <div class="task-top">
+                <div>
+                    <h3><span class="num">{{ loop.index }}</span> {% if t.id in new_ids %}<span class="badge bad">New</span> {% endif %}{{ t.title }}</h3>
+                    <p class="muted">{{ t.description or 'No additional details' }}</p>
+                </div>
+                <span class="badge {{ 'warn' if t.status=='Proposed' else ('ok' if t.status=='Completed' else ('bad' if t.status=='Rejected' else 'gray')) }}">{{ t.status }}</span>
+            </div>
+            <div class="task-meta"><span>From: <b>{{ t.assigned_by or '—' }}</b></span><span class="{{ 'late-text' if late }}">Due: {{ t.due_date or 'Not set' }}{% if late %} · overdue{% endif %}</span><span>Updated: {{ t.updated_at|dt }}</span></div>
+            {% if t.status in ('Assigned','In Progress') %}
+            <form method="POST" action="{{ url_for('employee_task_update', task_id=t.id) }}" class="task-update">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="field"><label>Status</label><select name="status"><option {{ 'selected' if t.status=='Assigned' }}>Assigned</option><option {{ 'selected' if t.status=='In Progress' }}>In Progress</option><option>Completed</option></select></div>
+                <div class="field wide"><label>Progress note</label><input name="employee_note" value="{{ t.employee_note or '' }}" maxlength="2000" placeholder="What have you completed?"></div>
+                <button class="btn small" type="submit">Update</button>
+            </form>
+            {% elif t.employee_note %}<p><strong>My update:</strong> {{ t.employee_note }}</p>{% endif %}
+            {% if t.status in ('Completed','Rejected') %}
+            <form method="POST" action="{{ url_for('employee_task_delete', task_id=t.id) }}" class="inline-form" onsubmit="return confirm('Remove this task from your dashboard? It stays saved in your work sheet.');"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger small" type="submit">Delete</button></form>
+            {% endif %}
+        </article>
+    {% else %}<p class="muted">No tasks yet. You can propose your own work below.</p>{% endfor %}
+    </div>
+</div>
+
+<div class="grid grid-main mb-2">
+<section class="card"><h2>Propose work to admin</h2><p class="muted">Tell admin what you plan to work on. It appears as a proposal until reviewed.</p>
+<form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="field"><label>Task / work title</label><input name="title" required maxlength="180" placeholder="e.g. Improve mobile dashboard"></div>
+<div class="field"><label>Details / expected outcome</label><textarea name="description" rows="4" maxlength="4000" placeholder="Describe the work and expected result"></textarea></div>
+<div class="field"><label>Target date (optional)</label><input type="date" name="due_date"></div><button class="btn" type="submit">Send proposal</button></form></section>
+<section class="card"><h2>Status guide</h2><div class="kv"><div class="k">Planned / Assigned</div><div>Ready to start</div><div class="k">In Progress</div><div>You are working on it</div><div class="k">Blocked</div><div>Waiting — tell HR why in the note</div><div class="k">Completed</div><div>Finished; HR and admin are told</div><div class="k">Proposed</div><div>Waiting for admin review</div></div></section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var chips=document.querySelectorAll('[data-filter]');
+  chips.forEach(function(ch){ch.addEventListener('click',function(){
+    chips.forEach(function(c){c.classList.remove('active');});ch.classList.add('active');
+    var f=ch.getAttribute('data-filter');
+    document.querySelectorAll('.work-item').forEach(function(a){a.hidden=(f!=='all'&&a.getAttribute('data-group')!==f);});
+  });});
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "hr/base.html" %}
+{% block title %}Certificates{% endblock %}{% block heading %}Employee Certificates{% endblock %}
+{% block content %}
+<div class="grid grid-main"><section class="card"><h2>Issue a certificate</h2><p class="muted">Choose an approved employee. Their saved profile photograph will be added automatically to the certificate.</p>
+<form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="field"><label>Employee</label><select name="employee_id" required><option value="">Select employee</option>{% for e in employees if e.status == 'approved' %}<option value="{{ e.id }}">{{ e.full_name }} — {{ e.username }}</option>{% endfor %}</select></div>
+<div class="field"><label>Certificate title</label><input name="certificate_title" value="Certificate of Achievement" maxlength="120" required></div>
+<div class="field"><label>Achievement / employment period</label><input name="period" placeholder="e.g. Jan 2026 – Jun 2026" maxlength="120" required></div>
+<div class="field"><label>Description</label><textarea name="description" rows="4" maxlength="2000" required placeholder="Write what the employee is being recognized for"></textarea></div>
+<button class="btn" type="submit">Create certificate</button></form></section>
+<section class="card"><h2>Issued certificates</h2>{% for cert in certificates %}<div class="notice"><div class="row">{% if cert.profile_picture %}<img src="{{ url_for('profile_picture', emp_id=cert.employee_id) }}" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover">{% endif %}<div><strong>{{ cert.employee_name or cert.recipient_name }}</strong><p>{{ cert.certificate_title }} · {{ cert.period }}</p></div><span class="spacer"></span><a class="btn small" href="{{ url_for('hr.certificate_view', cert_id=cert.id) }}">Open / Print</a></div><small>Issued by {{ cert.issued_by }} · {{ cert.issued_at|dt }}</small></div>{% else %}<p class="muted">No certificates issued yet.</p>{% endfor %}</section></div>
+{% endblock %}

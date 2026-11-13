@@ -1,0 +1,31 @@
+{% extends 'hr/base.html' %}
+{% block title %}Recruitment{% endblock %}{% block heading %}Recruitment{% endblock %}
+{% block content %}
+<div class="grid grid-2">
+<section class="panel"><h2>New job opening</h2>
+<form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="job_add">
+<label>Job title<input name="title" required></label>
+<label>Department<select name="department_id"><option value="">—</option>{% for d in depts %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}</select></label>
+<label>Vacancies<input type="number" name="vacancies" value="1" min="1" max="100"></label>
+<label>Description<textarea name="description" rows="2"></textarea></label>
+<div><button class="btn primary">Create opening</button></div></form></section>
+<section class="panel"><h2>Add a candidate</h2>
+<form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="cand_add">
+<label>Job<select name="job_id" required>{% for j in jobs if j.status=='Open' %}<option value="{{ j.id }}">{{ j.title }}</option>{% endfor %}</select></label>
+<label>Full name<input name="full_name" required></label>
+<label>Email<input type="email" name="email"></label>
+<label>Phone<input name="phone"></label>
+<label>Notes<input name="notes"></label>
+<div><button class="btn primary">Add candidate</button></div></form></section>
+</div>
+<section class="panel"><h2>Job openings</h2><div class="table-wrap"><table><thead><tr><th>Job</th><th>Department</th><th>Vacancies</th><th>Candidates</th><th>Hired</th><th>Status</th></tr></thead><tbody>
+{% for j in jobs %}<tr><td><b>{{ j.title }}</b><div class="table-subtext">{{ j.description }}</div></td><td>{{ j.dept or '—' }}</td><td>{{ j.vacancies }}</td><td>{{ j.total }}</td><td>{{ j.hired }}</td>
+<td><form method="post" class="row-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="job_status"><input type="hidden" name="job_id" value="{{ j.id }}">{% if j.status=='Open' %}<span class="badge ok">Open</span><button class="btn small secondary" name="status" value="Closed">Close</button>{% else %}<span class="badge gray">Closed</span><button class="btn small" name="status" value="Open">Re-open</button>{% endif %}</form></td></tr>
+{% else %}<tr><td colspan="6" class="muted">No job openings yet.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="panel"><h2>Candidates</h2><div class="table-wrap"><table><thead><tr><th>Candidate</th><th>Job</th><th>Contact</th><th>Stage</th><th></th></tr></thead><tbody>
+{% for c in cands %}<tr><td><b>{{ c.full_name }}</b><div class="table-subtext">{{ c.notes }}</div></td><td>{{ c.job_title }}</td><td>{{ c.email or '' }} {{ c.phone or '' }}</td>
+<td><form method="post" class="row-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="cand_stage"><input type="hidden" name="candidate_id" value="{{ c.id }}"><select name="stage">{% for s in stages %}<option {% if c.stage==s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select><button class="btn small">Move</button></form></td>
+<td><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="cand_delete"><input type="hidden" name="candidate_id" value="{{ c.id }}"><button class="btn small danger" onclick="return confirm('Remove this candidate?')">Remove</button></form></td></tr>
+{% else %}<tr><td colspan="5" class="muted">No candidates yet.</td></tr>{% endfor %}</tbody></table></div>
+<p class="hr-note">When you mark a candidate as Hired, the admin is notified to approve their account and set their salary.</p></section>
+{% endblock %}

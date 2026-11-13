@@ -1,0 +1,15 @@
+{% extends "public_base.html" %}
+{% block title %}Enter SMS code - CyberAttend{% endblock %}
+{% block boxclass %}emp{% endblock %}
+{% block content %}
+<h1>Enter the SMS code</h1>
+<p class="sub">Type the 6-digit code we sent to your phone and choose a new password. The code works for 10 minutes.</p>
+<form method="POST" autocomplete="off">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field"><label>6-digit code</label><input type="text" name="code" required maxlength="6" minlength="6" inputmode="numeric" pattern="[0-9]{6}" autofocus></div>
+    <div class="field"><label>New password</label><input type="password" name="new" required minlength="6"></div>
+    <div class="field"><label>Confirm new password</label><input type="password" name="confirm" required minlength="6"></div>
+    <button class="btn" type="submit">Set new password</button>
+</form>
+<div class="links"><a href="{{ url_for('forgot_password') }}">Start again</a> &middot; <a href="{{ url_for('login') }}">Back to sign in</a></div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'employee/base.html' %}
+{% block title %}My Salary{% endblock %}{% block heading %}My Salary{% endblock %}
+{% block content %}
+<section class="panel"><h2>My monthly salary</h2>
+{% if prof and prof.base_salary > 0 %}<p>Basic salary: <b>Rs {{ '{:,.0f}'.format(prof.base_salary) }}</b> · Monthly allowance: <b>Rs {{ '{:,.0f}'.format(prof.allowance) }}</b></p><p><b>Monthly fixed total: Rs {{ '{:,.0f}'.format(prof.base_salary + prof.allowance) }}</b></p>
+{% else %}<p class="muted">Your monthly salary has not been configured yet. Please contact HR or the administrator.</p>{% endif %}</section>
+{% for r in rows %}
+<section class="panel"><h2>{{ r.pay_month }} {% if r.status=='Paid' %}<span class="badge ok">Paid</span>{% elif r.status=='On Hold' %}<span class="badge bad">On hold</span>{% else %}<span class="badge warn">Not paid yet</span>{% endif %}</h2>
+<div class="table-wrap"><table><tbody>
+<tr><td>Basic salary</td><td class="right">Rs {{ '{:,.0f}'.format(r.basic) }}</td></tr>
+<tr><td>Allowance</td><td class="right">Rs {{ '{:,.0f}'.format(r.allowance) }}</td></tr>
+<tr><td>Bonus</td><td class="right">Rs {{ '{:,.0f}'.format(r.bonus) }}</td></tr>
+<tr><td>Deduction for leave</td><td class="right">− Rs {{ '{:,.0f}'.format(r.leave_deduction or 0) }}</td></tr>
+<tr><td>Other deduction</td><td class="right">− Rs {{ '{:,.0f}'.format(r.other_deduction or 0) }}</td></tr>
+<tr><td><b>Net salary</b></td><td class="right net-cell">Rs {{ '{:,.0f}'.format(r.net) }}</td></tr></tbody></table></div>
+{% if r.leaves %}<p class="hr-note"><b>Leave in this month:</b> {% for l in r.leaves %}{{ l.leave_date }} ({{ l.leave_type }}{% if l.salary_deduction %} — Rs {{ '{:,.0f}'.format(l.salary_deduction) }} deducted{% else %} — no deduction{% endif %}){% if not loop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+{% if r.note %}<p class="hr-note">Note: {{ r.note }}</p>{% endif %}
+{% if r.status=='Paid' %}<p class="hr-note">Paid on {{ r.paid_at|dt }}{% if r.paid_by %} by {{ r.paid_by }}{% endif %}.</p>{% endif %}
+</section>
+{% else %}<section class="panel"><h2>No salary records yet</h2><p class="muted">Your salary history and monthly payslips will appear here after payroll is generated.</p></section>{% endfor %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'hr/base.html' %}
+{% block title %}HR Dashboard{% endblock %}{% block heading %}HR Dashboard{% endblock %}
+{% block content %}
+<div class="grid-cards">
+  <div class="stat-card"><span>Active employees</span><b>{{ metrics.employees }}</b></div>
+  <div class="stat-card"><span>Present today</span><b>{{ metrics.present }}</b></div>
+  <div class="stat-card"><span>Late today</span><b>{{ metrics.late }}</b></div>
+  <div class="stat-card"><span>On approved leave today</span><b>{{ metrics.on_leave }}</b></div>
+  <div class="stat-card"><span>Pending leave requests</span><b>{{ metrics.pending_leaves }}</b></div>
+  <div class="stat-card"><span>Pending expense claims</span><b>{{ metrics.pending_expenses }}</b></div>
+  <div class="stat-card"><span>Messages waiting for HR</span><b>{{ metrics.open_messages }}</b></div>
+  <div class="stat-card"><span>Documents expiring (30 days)</span><b>{{ metrics.expiring_docs }}</b></div>
+  <div class="stat-card"><span>Open jobs</span><b>{{ metrics.open_jobs }}</b></div>
+  <div class="stat-card"><span>Candidates in pipeline</span><b>{{ metrics.candidates }}</b></div>
+</div>
+
+<section class="panel"><h2>Leave requests waiting for you</h2>
+<div class="table-wrap"><table><thead><tr><th>Employee</th><th>Date</th><th>Type</th><th>Reason</th></tr></thead><tbody>
+{% for r in pending %}<tr><td>{{ r.full_name }}</td><td>{{ r.leave_date }}</td><td>{{ r.leave_type }}</td><td>{{ r.reason or '—' }}</td></tr>
+{% else %}<tr><td colspan="4" class="muted">Nothing pending. 🎉</td></tr>{% endfor %}</tbody></table></div>
+<p class="hr-note">Approve or reject in <a href="{{ url_for('hr.leaves', status='pending') }}">Leave Requests</a>. After HR approves, the admin decides if any salary is deducted.</p></section>
+
+<div class="grid grid-2">
+<section class="panel"><h2>Upcoming approved leave</h2>
+<div class="table-wrap"><table><thead><tr><th>Employee</th><th>Date</th><th>Type</th></tr></thead><tbody>
+{% for r in upcoming %}<tr><td>{{ r.full_name }}</td><td>{{ r.leave_date }}</td><td>{{ r.leave_type }}</td></tr>
+{% else %}<tr><td colspan="3" class="muted">No upcoming leave.</td></tr>{% endfor %}</tbody></table></div></section>
+
+<section class="panel"><h2>Documents expiring soon</h2>
+<div class="table-wrap"><table><thead><tr><th>Employee</th><th>Document</th><th>Expires</th></tr></thead><tbody>
+{% for r in expiring %}<tr><td>{{ r.full_name }}</td><td>{{ r.title }}</td><td>{{ r.expiry_date }}</td></tr>
+{% else %}<tr><td colspan="3" class="muted">No documents expiring in the next 30 days.</td></tr>{% endfor %}</tbody></table></div></section>
+</div>
+
+<section class="panel"><h2>Expense claims awaiting review</h2>
+<div class="table-wrap"><table><thead><tr><th>Employee</th><th>Category</th><th>Amount</th><th>Date</th></tr></thead><tbody>
+{% for r in expenses %}<tr><td>{{ r.full_name }}</td><td>{{ r.category }}</td><td>Rs {{ '{:,.0f}'.format(r.amount) }}</td><td>{{ r.expense_date }}</td></tr>
+{% else %}<tr><td colspan="4" class="muted">No pending claims.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

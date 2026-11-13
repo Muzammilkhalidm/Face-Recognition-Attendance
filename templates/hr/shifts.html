@@ -1,0 +1,18 @@
+{% extends 'hr/base.html' %}
+{% block title %}Shifts{% endblock %}{% block heading %}Shifts{% endblock %}
+{% block content %}
+<section class="panel"><h2>Assign a shift</h2>
+<form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>Employee<select name="employee_id" required>{% for e in emps %}<option value="{{ e.id }}">{{ e.full_name }}</option>{% endfor %}</select></label>
+<label>Shift name<input name="shift_name" value="General"></label>
+<label>Starts<input type="time" name="start_time" value="09:00"></label>
+<label>Ends<input type="time" name="end_time" value="17:00"></label>
+<label>Effective from<input type="date" name="effective_from" value="{{ today }}"></label>
+<label>Effective to (optional)<input type="date" name="effective_to"></label>
+<label>Break (minutes)<input type="number" name="break_minutes" value="60" min="0" max="240"></label>
+<div><button class="btn primary">Assign shift</button></div></form></section>
+<section class="panel"><h2>Assigned shifts</h2><div class="table-wrap"><table><thead><tr><th>Employee</th><th>Shift</th><th>Hours</th><th>From</th><th>To</th><th>Break</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.full_name }}</td><td>{{ r.shift_name }}</td><td>{{ r.start_time }}–{{ r.end_time }}</td><td>{{ r.effective_from }}</td><td>{{ r.effective_to or 'Ongoing' }}</td><td>{{ r.break_minutes }} min</td>
+<td><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="delete"><input type="hidden" name="shift_id" value="{{ r.id }}"><button class="btn small danger" onclick="return confirm('Remove this shift?')">Remove</button></form></td></tr>
+{% else %}<tr><td colspan="7" class="muted">No shifts assigned.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

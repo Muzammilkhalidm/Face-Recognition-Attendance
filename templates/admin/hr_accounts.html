@@ -1,0 +1,50 @@
+{% extends 'admin/base.html' %}
+{% block title %}HR Login Accounts{% endblock %}
+{% block heading %}HR Login Accounts{% endblock %}
+{% block content %}
+<div class="grid grid-main">
+    <div class="card">
+        <h2>HR accounts ({{ users|length }})</h2>
+        <div class="table-wrap"><table>
+            <thead><tr><th>Name</th><th>Username</th><th>Status</th><th>Last login</th><th>Created</th><th></th></tr></thead>
+            <tbody>
+            {% for u in users %}
+            <tr>
+                <td><b>{{ u.full_name }}</b></td>
+                <td class="muted">{{ u.username }}</td>
+                <td>{% if u.active %}<span class="badge ok">Active</span>{% else %}<span class="badge bad">Disabled</span>{% endif %}</td>
+                <td class="muted">{{ u.last_login|dt if u.last_login else 'Never' }}</td>
+                <td class="muted">{{ u.created_at|dt }}</td>
+                <td class="right">
+                    <form class="inline" method="POST" action="{{ url_for('admin_hr_toggle', user_id=u.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn {{ 'danger' if u.active else 'secondary' }} small" type="submit">{{ 'Disable' if u.active else 'Enable' }}</button>
+                    </form>
+                    <form class="inline" method="POST" action="{{ url_for('admin_hr_reset', user_id=u.id) }}" style="margin-top:6px">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="password" name="password" placeholder="New password" minlength="8" required style="width:130px">
+                        <button class="btn secondary small" type="submit">Reset</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="muted">No HR accounts created yet. Use the form to add the first one.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table></div>
+        <p class="scan-note" style="text-align:left">HR staff sign in at <code>/hr/login</code> and receive their own full HR workspace: employee directory and records, attendance, leave requests, WFH requests, payroll viewing, projects, shifts, documents, expenses, recruitment, employee messages and Excel exports. Admin-only controls such as account administration, system settings, backups, face datasets and salary payments remain protected. Disabling an account locks that person out immediately.</p>
+    </div>
+
+    <div class="card">
+        <h2>Create HR portal account</h2>
+        <form method="POST" autocomplete="off">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="field"><label>Full name</label><input type="text" name="full_name" required></div>
+            <div class="field"><label>Username</label><input type="text" name="username" required minlength="3"></div>
+            <div class="field"><label>Temporary password</label><input type="password" name="password" required minlength="8">
+                <div class="hint">Minimum 8 characters. Share it directly with the HR staff member.</div></div>
+            <button class="btn" type="submit">Create HR portal account</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

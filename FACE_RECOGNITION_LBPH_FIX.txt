@@ -1,0 +1,29 @@
+FACE RECOGNITION / LBPH FIX
+============================
+
+The 50/50 capture succeeded. The error was raised during LBPH model creation:
+cv2.face existed, but cv2.face.LBPHFaceRecognizer_create was missing.
+This normally means a conflicting/non-contrib OpenCV wheel is being imported.
+
+IMPORTANT: run these commands from the cyberattend folder in the SAME Python
+environment used to start Flask. Close Flask first.
+
+  python -m pip uninstall -y opencv-python opencv-python-headless opencv-contrib-python opencv-contrib-python-headless
+  python -m pip install --no-cache-dir -r requirements.txt
+
+Verify the active OpenCV installation:
+
+  python -c "import cv2; print(cv2.__file__); print(cv2.__version__); print(hasattr(cv2, 'face')); print(hasattr(cv2.face, 'LBPHFaceRecognizer_create'))"
+
+The last two values should be True and True.
+
+Then start the app:
+
+  python app.py
+
+Do NOT delete the dataset folder. The existing captured face images should be
+kept. If registration previously remained face_pending, open the enrollment
+page and use its retry/continue flow if available; otherwise ask an admin to
+use the project's existing re-enrollment action. The backend finalization
+function is safe to retry and only changes status to pending after training
+succeeds.

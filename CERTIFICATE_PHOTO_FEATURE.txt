@@ -1,0 +1,12 @@
+CYBERATTEND - EMPLOYEE CERTIFICATE PHOTO FEATURE
+
+- Admin can issue certificates from Admin > Certificates.
+- HR can issue certificates from HR > Certificates.
+- The employee's existing profile photograph is automatically displayed on the certificate.
+- If an employee has no profile photo, the certificate displays an initial placeholder.
+- Issued certificates appear under Employee > My Certificates.
+- Employees receive an in-app notification when a certificate is issued.
+- Admin and HR can print certificates or use the browser Print dialog to save as PDF.
+- Profile photographs are served through the authenticated profile-picture route; HR access is checked against an active HR account.
+
+No database migration is needed: the existing certificates table and employee profile_picture field are reused.

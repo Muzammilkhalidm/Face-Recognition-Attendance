@@ -1,0 +1,23 @@
+{% extends "public_base.html" %}
+{% block title %}Forgot password - CyberAttend{% endblock %}
+{% block boxclass %}emp{% endblock %}
+{% block content %}
+<h1>Forgot password</h1>
+
+{% if sms_enabled() %}
+<h3>Get a code by SMS</h3>
+<p class="sub">Enter the phone number on your account and we will text you a 6-digit code. (An email makes the admin reset it for you.)</p>
+{% else %}
+<h3>Ask the admin to reset it</h3>
+<p class="sub">Enter the phone number or email on your account. The admin gets a notification and sends you a new password.</p>
+{% endif %}
+<form method="POST" action="{{ url_for('forgot_password_request') }}" autocomplete="off">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field"><label>Phone number or email</label><input type="text" name="contact" required maxlength="254" inputmode="email" placeholder="03001234567 or name@email.com"></div>
+    <button class="btn secondary" type="submit">{% if sms_enabled() %}Send code{% else %}Notify admin{% endif %}</button>
+</form>
+<div class="links">
+    <a href="{{ url_for('login') }}">Back to sign in</a><br>
+    <span class="muted">Your phone number is saved by the admin when your account is created.</span>
+</div>
+{% endblock %}
